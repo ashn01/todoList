@@ -1,8 +1,6 @@
 import React from 'react'
 
-import {postServerWithData, LOGIN} from '../../APIROUTE'
-import { BehaviorSubject } from 'rxjs';
-
+import authenticationService from '../../services/Authentication'
 
 export default class Login extends React.PureComponent
 {
@@ -14,27 +12,17 @@ export default class Login extends React.PureComponent
             email:"",
             password:""
         }
-        this.currentUserSubject = new BehaviorSubject(JSON.parse(localStorage.getItem('currentUser')));
-        if(this.currentUserSubject.value)
-        {
+
+        if (authenticationService.currentUserValue) { 
             this.props.history.push('/home');
         }
     }
     handleSubmit = (e) =>
     {
         e.preventDefault();
-        
-        postServerWithData(LOGIN, 
-            {
-                username:this.state.email,
-                password:this.state.password
-            }).then(res=>{
-                    localStorage.setItem('currentUser', JSON.stringify(res.data));
-                    this.currentUserSubject.next(res.data);
-                    this.props.history.push("/home");
-            }).catch(err=>{
-                console.log("failed "+err)
-            })
+        authenticationService.login(this.state.email,this.state.password).then(res=>{
+            this.props.history.push("/home")
+        })
     }
 
     handleChange = (e) =>
@@ -62,7 +50,8 @@ export default class Login extends React.PureComponent
                         <input type="password" className="form-control" 
                         id="password" onChange={e=>this.handleChange(e)}/>
                     </div>
-                    <button type="submit" className="btn btn-primary">Submit</button>
+                    <button type="submit" className="btn btn-primary">Login</button>
+                    <button type="button" className="btn btn-primary" onClick={()=>this.props.history.push("/register")}>Register</button>
                 </form>
             </div>
         )
