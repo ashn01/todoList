@@ -47,6 +47,17 @@ export default class Category extends React.PureComponent
             </ul>
             </div>
             <div className="card-body">
+                <ul className="list-group">
+                    <div className="input-group" >
+                        <input type="text" className="form-control" placeholder="Enter a new Todo"
+                        aria-label="Recipient's username with two button addons" 
+                        aria-describedby="button-addon4" />
+                        <div className="input-group-append" id="addTodo">
+                            <button className="btn btn-outline-primary" type="button">Add</button>
+                        </div>
+                    </div>
+                </ul>
+                <hr/>
                 <Todos/>
             </div>
         </div>

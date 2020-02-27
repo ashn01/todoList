@@ -1,5 +1,7 @@
 import React from 'react'
 
+import '../../css/Todo.css'
+
 export default class Todos extends React.PureComponent
 {
     constructor(props) {
@@ -34,10 +36,10 @@ export default class Todos extends React.PureComponent
                                         <input type="checkbox" aria-label="Checkbox for following text input"/>
                                         </div>
                                     </div>
-                                    <input type="text" className="form-control" aria-label="Recipient's username with two button addons" aria-describedby="button-addon4" value={v.name} readOnly/>
+                                    <input type="text" className="todoInput form-control" value={v.name} readOnly/>
                                     <div className="input-group-append" id="button-addon4">
-                                        <button className="btn btn-outline-secondary" type="button">Edit</button>
-                                        <button className="btn btn-outline-secondary" type="button">Remove</button>
+                                        <button className="btn btn-outline-info" type="button">Edit</button>
+                                        <button className="btn btn-outline-danger" type="button">Remove</button>
                                     </div>
                                 </div>
                             )

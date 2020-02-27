@@ -13,6 +13,7 @@ namespace TodoListWeb.Models
         public string TodoDescription { get; set; }
         public DateTime TodoDeadline { get; set; }
         public bool TodoCompleted { get; set; }
-        public Category TodoCategory { get; set; }
+        public Category Category { get; set; }
+
     }
 }

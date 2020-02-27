@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TodoListWeb.Models
+namespace TodoListWeb.ViewModels
 {
-    public class Category
+    public class CategoryModel
     {
-        public int ID { get; set; }
         public string CategoryName { get; set; }
-        public string Owner { get; set; }
     }
 }

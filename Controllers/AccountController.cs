@@ -54,7 +54,7 @@ namespace TodoListWeb.Controllers
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString())
                 }),
-                Expires = DateTime.UtcNow.AddSeconds(10),
+                Expires = DateTime.UtcNow.AddDays(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -68,6 +68,33 @@ namespace TodoListWeb.Controllers
                 LastName = user.LastName,
                 Token = tokenString
             });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("validate")]
+        public IActionResult Validate()
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
+            //var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(jwt);
+            // authentication successful so generate jwt token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                }, out SecurityToken validatedToken);
+            }catch
+            {
+                return Unauthorized(new { message = "Invalid Token" });
+            }
+
+            return Ok();
         }
 
         [AllowAnonymous]

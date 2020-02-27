@@ -1,8 +1,8 @@
 import React from 'react'
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import $ from 'jquery'
+import store from '../../store'
 
-import  history  from '../../helpers/history';
 import authenticationService from '../../services/Authentication'
 
 export default class Header extends React.PureComponent
@@ -11,30 +11,44 @@ export default class Header extends React.PureComponent
         super(props);
     
         this.state = {
-          currentUser: null
+          currentUser: {
+              id:"",
+              email:"",
+              firstName:"",
+              lastName:""
+          },
+          toLogin: false
         };
+        this.unsubscribe={};
     }
 
-    componentDidMount() {
+    componentDidMount() 
+    {
+        var info = store.getState().userInfo
+        this.setState({currentUser:info})
         $('#headNav .nav-item').click((e)=>{
             $('#headNav .nav-item').removeClass('active');
             $(e.target).addClass('active');
         })
 
-        authenticationService.currentUser.subscribe(x => this.setState({
-          currentUser: x
-        }));
+        authenticationService.validate().then(res=>{
+            console.log(res)
+        }).catch(err=>{
+            this.setState({toLogin:true})
+        })
+    }
 
-       
-      }
-
-    logout() {
+    logout=()=> {
         authenticationService.logout()
-        history.push('/login');
+        this.setState({toLogin : true})
     }
 
     render()
     {
+        if(this.state.toLogin === true)
+        {
+            return <Redirect to="/login"/>
+        }
         return(
             <nav className="navbar navbar-expand-md navbar-dark bg-dark">
                 <div className="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
@@ -48,7 +62,7 @@ export default class Header extends React.PureComponent
                     </ul>
                 </div>
                 <div className="mx-auto order-0">
-                    <Link to="/home" className="navbar-brand">My Todos</Link>
+                    <Link to="/home" className="navbar-brand">{this.state.currentUser.firstName+" "+this.state.currentUser.lastName+"'s"} Todos</Link>
                     <button className="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
                         <span className="navbar-toggler-icon"></span>
                     </button>

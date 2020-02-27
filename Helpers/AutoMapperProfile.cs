@@ -13,6 +13,7 @@ namespace TodoListWeb.Helpers
         public AutoMapperProfile()
         {
             CreateMap<RegisterModel, User>();
+            CreateMap<CategoryModel, Category>();
         }
     }
 }

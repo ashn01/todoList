@@ -1,0 +1,4 @@
+.todoInput.form-control[readonly]
+{
+    background-color: #ffffff;
+}
