@@ -7,6 +7,8 @@ namespace TodoListWeb.ViewModels
 {
     public class CategoryModel
     {
+        public int Id { get; set; }
         public string CategoryName { get; set; }
+        public string Owner { get; set; }
     }
 }

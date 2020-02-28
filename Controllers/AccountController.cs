@@ -75,26 +75,11 @@ namespace TodoListWeb.Controllers
         public IActionResult Validate()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
-            //var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(jwt);
-            // authentication successful so generate jwt token
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
-            try
-            {
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                }, out SecurityToken validatedToken);
-            }catch
-            {
+            if (_userService.Validate(token))
+                return Ok();
+            else
                 return Unauthorized(new { message = "Invalid Token" });
-            }
-
-            return Ok();
         }
 
         [AllowAnonymous]

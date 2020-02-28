@@ -56,11 +56,29 @@ namespace TodoListWeb.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CategoryName = table.Column<string>(nullable: true)
+                    CategoryName = table.Column<string>(nullable: true),
+                    Owner = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Todos",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TodoName = table.Column<string>(nullable: true),
+                    TodoDescription = table.Column<string>(nullable: true),
+                    TodoDeadline = table.Column<DateTime>(nullable: false),
+                    TodoCompleted = table.Column<bool>(nullable: false),
+                    CategoryId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Todos", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -169,29 +187,6 @@ namespace TodoListWeb.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Todos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TodoName = table.Column<string>(nullable: true),
-                    TodoDescription = table.Column<string>(nullable: true),
-                    TodoDeadline = table.Column<DateTime>(nullable: false),
-                    TodoCompleted = table.Column<bool>(nullable: false),
-                    TodoCategoryID = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Todos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Todos_Categories_TodoCategoryID",
-                        column: x => x.TodoCategoryID,
-                        principalTable: "Categories",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -230,11 +225,6 @@ namespace TodoListWeb.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Todos_TodoCategoryID",
-                table: "Todos",
-                column: "TodoCategoryID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -255,6 +245,9 @@ namespace TodoListWeb.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Categories");
+
+            migrationBuilder.DropTable(
                 name: "Todos");
 
             migrationBuilder.DropTable(
@@ -262,9 +255,6 @@ namespace TodoListWeb.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "Categories");
         }
     }
 }

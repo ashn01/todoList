@@ -14,6 +14,8 @@ namespace TodoListWeb.Helpers
         {
             CreateMap<RegisterModel, User>();
             CreateMap<CategoryModel, Category>();
+            CreateMap<Category, CategoryModel> ();
+            CreateMap<TodoModel, Todo>();
         }
     }
 }

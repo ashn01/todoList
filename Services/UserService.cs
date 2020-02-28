@@ -17,6 +17,7 @@ namespace TodoListWeb.Services
     public interface IUserService
     {
         User Authenticate(string username, string password);
+        public bool Validate(string token);
         User Create(User user, string password);
         IEnumerable<User> GetAll();
     }
@@ -47,6 +48,28 @@ namespace TodoListWeb.Services
 
 
             return user;
+        }
+
+        public bool Validate(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                }, out SecurityToken validatedToken);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public IEnumerable<User> GetAll()

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link, Redirect } from 'react-router-dom';
 import $ from 'jquery'
-import store from '../../store'
+import {store} from '../../store'
 
 import authenticationService from '../../services/Authentication'
 
@@ -32,7 +32,7 @@ export default class Header extends React.PureComponent
         })
 
         authenticationService.validate().then(res=>{
-            console.log(res)
+            //console.log(res)
         }).catch(err=>{
             this.setState({toLogin:true})
         })

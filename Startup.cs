@@ -14,6 +14,7 @@ using System.Text;
 using TodoListWeb.Data;
 using TodoListWeb.Helpers;
 using TodoListWeb.Services;
+using TodoListWeb.Data.Repositories;
 
 namespace TodoListWeb
 {
@@ -77,6 +78,8 @@ namespace TodoListWeb
 
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ITodoRepository, TodoRepository>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

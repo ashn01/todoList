@@ -46,7 +46,7 @@ class Login extends React.PureComponent
         authenticationService.validate().then(res=>{
             this.setState({toLogin:true})
         }).catch(err=>{
-            console.log(err)
+            //console.log(err)
         })
     }
 

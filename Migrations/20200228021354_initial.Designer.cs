@@ -10,8 +10,8 @@ using TodoListWeb.Data;
 namespace TodoListWeb.Migrations
 {
     [DbContext(typeof(TodoListContext))]
-    [Migration("20200227015949_second")]
-    partial class second
+    [Migration("20200228021354_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -172,12 +172,12 @@ namespace TodoListWeb.Migrations
 
             modelBuilder.Entity("TodoListWeb.Models.Todo", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("CategoryID")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<bool>("TodoCompleted")
@@ -192,9 +192,7 @@ namespace TodoListWeb.Migrations
                     b.Property<string>("TodoName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryID");
+                    b.HasKey("ID");
 
                     b.ToTable("Todos");
                 });
@@ -327,13 +325,6 @@ namespace TodoListWeb.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("TodoListWeb.Models.Todo", b =>
-                {
-                    b.HasOne("TodoListWeb.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryID");
                 });
 #pragma warning restore 612, 618
         }

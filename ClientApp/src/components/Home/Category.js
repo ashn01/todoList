@@ -2,28 +2,70 @@ import React from 'react'
 import $ from 'jquery'
 
 import Todos from './Todos'
+import CategoryModal from './CategoryModal'
+import {postServerWithDataAndAuth , GETCATEGORY} from '../../APIROUTE'
+import {store} from '../../store'
 
 import '../../css/Category.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default class Category extends React.PureComponent
 {
     constructor(props) {
         super(props);
         this.state = {
-            category : [
-                {title : "My Category"},
-                {title : "My Category2"},
-                {title : "My Category3"}
-            ]
+            category : [],
+            modalShow : false,
+            selectedCategory : 0,
+            isNewCategory : false,
+            isLoaded: false
         }
     }
 
     componentDidMount()
+    {        
+        this.getCategoryFromServer()
+    }
+
+    getCategoryFromServer()
     {
-        $('.nav li').click((e)=>{
-            $('.nav li div.active').removeClass('active');
-            $(e.target).addClass('active');
+        var info = store.getState().userInfo
+        
+        postServerWithDataAndAuth(GETCATEGORY,{
+            id:info.id
+        }).then(res=>{
+            this.setState({category : res.data.categories, isLoaded:true},()=>{
+                $('.nav .categoryPanel').click((e)=>{
+                    $('.nav .categoryPanel div.active').removeClass('active');
+                    $(e.target).addClass('active');
+                    this.setState({selectedCategory : e.target.id >= this.state.category.length ? 0 : e.target.id})
+                });
+            })
         })
+    }
+
+    setModalShow = (show,selected,isNew,update) => {
+        if(show)
+        { // show modal
+            this.setState({
+                modalShow : show, 
+                selectedCategory: selected !== undefined ? selected.target.id : this.state.selectedCategory,
+                isNewCategory : isNew !== undefined ? isNew : false
+            })
+        }
+        else
+        { // close modal
+            this.setState({
+                modalShow : show
+            })
+        }
+
+        // update state from server
+        if(update !== undefined)
+        {
+            this.getCategoryFromServer()
+        }
+
     }
 
     render()
@@ -35,32 +77,35 @@ export default class Category extends React.PureComponent
                 {
                     this.state.category.map((v,i)=>{
                         return (
-                            <li className={`nav-item `} key={i} >
-                                <div className={`category nav-link ${i===0 ? "active" : ""}`} >{v.title}</div>
+                            <li className={`nav-item categoryPanel`} key={i} >
+                                <div className={`category nav-link ${i===0 ? "active" : ""}`}
+                                onDoubleClick={(e)=>this.setModalShow(true,e,false,undefined)} id={i}>
+                                    {v.categoryName} 
+                                </div>
                             </li>
                         )
                     })
                 }
                 <li className="nav-item">
-                    <div className="category nav-link" >+</div>
+                    <div className="category nav-link" onClick={this.addCategory} onClick = {()=>this.setModalShow(true,undefined,true,undefined)}>
+                        +
+                    </div>
                 </li>
             </ul>
             </div>
-            <div className="card-body">
-                <ul className="list-group">
-                    <div className="input-group" >
-                        <input type="text" className="form-control" placeholder="Enter a new Todo"
-                        aria-label="Recipient's username with two button addons" 
-                        aria-describedby="button-addon4" />
-                        <div className="input-group-append" id="addTodo">
-                            <button className="btn btn-outline-primary" type="button">Add</button>
-                        </div>
-                    </div>
-                </ul>
-                <hr/>
-                <Todos/>
-            </div>
+            {
+                this.state.isLoaded &&
+                <Todos category={this.state.category[this.state.selectedCategory]}/>
+            }
+            <CategoryModal  show={this.state.modalShow} 
+                            onHide={(update)=>this.setModalShow(false,undefined,false,update)} 
+                            category={
+                                this.state.isNewCategory ? 
+                                undefined
+                            :   this.state.category[this.state.selectedCategory]
+                            }/>
         </div>
+        
         )
     }
 }

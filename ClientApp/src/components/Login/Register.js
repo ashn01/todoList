@@ -12,6 +12,7 @@ export default class Register extends React.PureComponent
         {
             email:"",
             password:"",
+            confirmPassword:"",
             firstname:"",
             lastname:"",
             toLogin : false
@@ -19,19 +20,23 @@ export default class Register extends React.PureComponent
     }
     handleSubmit = (e) =>
     {
-        e.preventDefault();
-        postServerWithData(REGISTER,
-            {
-                email:this.state.email,
-                password:this.state.password,
-                firstname:this.state.firstname,
+        if (this.state.password === this.state.confirmPassword) 
+        {
+            e.preventDefault();
+            postServerWithData(REGISTER, {
+                email: this.state.email,
+                password: this.state.password,
+                firstname: this.state.firstname,
                 lastname: this.state.lastname
-            }).then(res=>{
-                //this.history.push("/login")
+            }).then(res => {
                 this.handleLogin()
-            }).catch(err=>{
+            }).catch(err => {
                 console.log(err)
             })
+        } else 
+        {
+            console.log("Password not match")
+        }
     }
 
     handleLogin = () =>
@@ -58,7 +63,7 @@ export default class Register extends React.PureComponent
                     <div className="jumbotron">
                         <h3>Doobi-Do!</h3>
                     </div>
-                    <form onSubmit={this.handleSubmit}>
+                    <form>
                         <div className="form-group">
                             <input autoFocus type="email" className="form-control" placeholder="Email address"
                             id="email" onChange={e=>this.handleChange(e)} value={this.state.email}/>
@@ -69,7 +74,7 @@ export default class Register extends React.PureComponent
                         </div>
                         <div className="form-group">
                             <input type="password" className="form-control" placeholder="Confirm Password"
-                            id="cpassword" onChange={e=>this.handleChange(e)} value={this.state.password}/>
+                            id="confirmPassword" onChange={e=>this.handleChange(e)} value={this.state.confirmPassword}/>
                         </div>
                         <div className="form-group">
                             <input autoFocus type="firstname" className="form-control" placeholder="First Name"
@@ -80,7 +85,7 @@ export default class Register extends React.PureComponent
                             id="lastname" onChange={e=>this.handleChange(e)} value={this.state.lastname}/>
                         </div>
                         <button type="button" className="btn btn-primary" onClick={this.handleLogin}>Cancel</button>
-                        <button type="submit" className="btn btn-primary float-right">Submit</button>
+                        <button type="button" className="btn btn-primary float-right" onClick={this.handleSubmit}>Submit</button>
                     </form>
                 </div>
             </div>

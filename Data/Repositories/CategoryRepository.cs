@@ -24,20 +24,24 @@ namespace TodoListWeb.Data.Repositories
         {
             _context.SaveChanges();
         }
-
+        public Category GetCategory(int id)
+        {
+            var result = _context.Categories.SingleOrDefault(l => id == (l.ID));
+            return result;
+        }
         public IEnumerable<Category> GetAllCategoriesById(string id)
         {
             var result = _context.Categories.Where(l => id.Contains(l.Owner)).ToList();
             return result;
         }
-        public void Edit(Category student)
+        public void Edit(Category category)
         {
-            _context.Categories.Update(student);
+            _context.Categories.Update(category);
         }
 
-        public void Delete(Category student)
+        public void Delete(Category category)
         {
-            _context.Categories.Remove(student);
+            _context.Categories.Remove(category);
         }
     }
 }
