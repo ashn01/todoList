@@ -11,5 +11,6 @@ namespace TodoListWeb.Data.Repositories
         IEnumerable<Category> GetAllCategoriesById(string id);
         public Category GetCategory(int id);
         void Save();
+        public void DeleteWithTodos(Category category);
     }
 }

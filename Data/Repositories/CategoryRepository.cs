@@ -43,5 +43,12 @@ namespace TodoListWeb.Data.Repositories
         {
             _context.Categories.Remove(category);
         }
+
+        public void DeleteWithTodos(Category category)
+        {
+            // delete todos
+            _context.Todos.RemoveRange(_context.Todos.Where(x => x.CategoryId == category.ID));
+            Delete(category);
+        }
     }
 }

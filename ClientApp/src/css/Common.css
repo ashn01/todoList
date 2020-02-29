@@ -5,3 +5,12 @@
     display: flex;
     align-items: center;
 }
+
+.input-group>.input-group-prepend.todoModalPrepand {
+    flex: 0 0 15%;
+}
+
+.input-group .input-group-text.todoModalText {
+    width: 100%;
+    text-align: center;
+}

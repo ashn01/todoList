@@ -56,6 +56,36 @@ namespace TodoListWeb.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("deleteById")]
+        public IActionResult Delete([FromBody]TodoModel model) // delete Todo by id
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
+
+            if (_userService.Validate(token))
+            {
+                Todo ret = _todoRepository.GetTodo(model.ID);
+                if (ret != null)
+                {
+                    try
+                    {
+                        _todoRepository.Delete(ret);
+                        _todoRepository.Save();
+                        return Ok();
+                    }
+                    catch (Exception ex)
+                    {
+                        // return error message if there was an exception
+                        return BadRequest(new { message = ex.Message });
+                    }
+                }
+                else
+                    return BadRequest(new { message = "Item Not Found" });
+            }
+            else
+                return Unauthorized(new { message = "Invalid Token" });
+        }
+
+        [AllowAnonymous]
         [HttpPost("getById")]
         public IActionResult GetById([FromBody]CategoryModel model)
         {
@@ -70,6 +100,31 @@ namespace TodoListWeb.Controllers
                     var todos = _mapper.Map<IEnumerable<Todo>>(ret);
 
                     return Ok(new { todos });
+                }
+                catch (Exception ex)
+                {
+                    // return error message if there was an exception
+                    return BadRequest(new { message = ex.Message });
+                }
+            }
+            else
+                return Unauthorized(new { message = "Invalid Token" });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("editById")]
+        public IActionResult Edit([FromBody]TodoModel model) // delete Category by category id
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
+
+            if (_userService.Validate(token))
+            {
+                try
+                {
+                    var todo = _mapper.Map<Todo>(model);
+                    _todoRepository.Edit(todo);
+                    _todoRepository.Save();
+                    return Ok();
                 }
                 catch (Exception ex)
                 {

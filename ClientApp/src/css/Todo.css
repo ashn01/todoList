@@ -2,3 +2,8 @@
 {
     background-color: #ffffff;
 }
+
+.completedTodo
+{
+    text-decoration: line-through;
+}

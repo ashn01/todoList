@@ -94,7 +94,7 @@ namespace TodoListWeb.Controllers
                 {
                     try
                     {
-                        _categoryRepository.Delete(ret);
+                        _categoryRepository.DeleteWithTodos(ret);
                         _categoryRepository.Save();
                         return Ok();
                     }

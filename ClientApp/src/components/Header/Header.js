@@ -2,10 +2,12 @@ import React from 'react'
 import { Link, Redirect } from 'react-router-dom';
 import $ from 'jquery'
 import {store} from '../../store'
+import { connect } from "react-redux";
+import { setHeader } from "../../Stores/Reducers/headerPanel";
 
 import authenticationService from '../../services/Authentication'
 
-export default class Header extends React.PureComponent
+class Header extends React.PureComponent
 {
     constructor(props) {
         super(props);
@@ -17,9 +19,9 @@ export default class Header extends React.PureComponent
               firstName:"",
               lastName:""
           },
+          panelIndex : 0,
           toLogin: false
         };
-        this.unsubscribe={};
     }
 
     componentDidMount() 
@@ -35,6 +37,12 @@ export default class Header extends React.PureComponent
             //console.log(res)
         }).catch(err=>{
             this.setState({toLogin:true})
+        })
+    }
+
+    handleSwitch = (index) =>{
+        this.setState({panelIndex : index},()=>{
+            this.props.setHeader(this.state.panelIndex)
         })
     }
 
@@ -54,10 +62,10 @@ export default class Header extends React.PureComponent
                 <div className="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
                     <ul id="headNav" className="navbar-nav mr-auto">
                         <li className="nav-item">
-                            <Link to="/home" className="nav-item nav-link active">OnGoing</Link>
+                            <Link to="/home" onClick={()=>this.handleSwitch(0)} className="nav-item nav-link active">OnGoing</Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/home" className="nav-item nav-link">Completed</Link>
+                            <Link to="/home" onClick={()=>this.handleSwitch(1)} className="nav-item nav-link">Completed</Link>
                         </li>
                     </ul>
                 </div>
@@ -78,3 +86,9 @@ export default class Header extends React.PureComponent
         )
     }
 }
+
+
+export default connect(
+    null,
+    {setHeader}
+)(Header)

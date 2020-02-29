@@ -11,5 +11,6 @@ namespace TodoListWeb.Data.Repositories
         IEnumerable<Todo> GetAllTodosById(int id);
         Todo GetTodo(int id);
         void Save();
+        public void DeleteAllById(int id);
     }
 }

@@ -10,6 +10,9 @@ export const MODIFYCATEGORY = `${process.env.REACT_APP_API_URL}/api/category/edi
 export const DELETECATEGORY = `${process.env.REACT_APP_API_URL}/api/category/deleteById`
 export const ADDTODO = `${process.env.REACT_APP_API_URL}/api/todo/add`
 export const GETTODO = `${process.env.REACT_APP_API_URL}/api/todo/getById`
+export const MODIFYTODO = `${process.env.REACT_APP_API_URL}/api/todo/editById`
+export const DELETETODO = `${process.env.REACT_APP_API_URL}/api/todo/deleteById`
+
 
 function getToken()
 {

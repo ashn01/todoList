@@ -22,7 +22,7 @@ export default class Main extends React.PureComponent
     {
         const contents = this.renderWhat();
         return(
-            <div>
+            <div className="mainComponent">
                 {
                     contents
                 }
