@@ -1,6 +1,8 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom';
 import { connect } from "react-redux";
+import {Spinner} from 'react-bootstrap'
+
 import { setInfo } from "../../Stores/Reducers/userInfo";
 
 import authenticationService from '../../services/Authentication'
@@ -17,15 +19,20 @@ class Login extends React.PureComponent
             email:"",
             password:"",
             toLogin : false,
-            toRegister : false
+            toRegister : false,
+            isLoaded : true
         }
+
     }
     handleSubmit = (e) =>
     {
         e.preventDefault();
+        this.setState({isLoaded : false})
         authenticationService.login(this.state.email,this.state.password).then(res=>{
             this.props.setInfo(res.id, res.email, res.firstName, res.lastName)
             this.setState({toLogin:true})
+        }).catch(err=>{
+            this.setState({isLoaded : true})
         })
     }
 
@@ -78,6 +85,11 @@ class Login extends React.PureComponent
                         <button type="submit" className="btn btn-primary btn-block">Login</button>
                         <button type="button" className="btn btn-primary btn-block" onClick={this.handleRegister}>Register</button>
                     </form>
+                </div>
+                <div className={`hideBack ${this.state.isLoaded ? "" : "active"}`}>
+                    <div className="spinnerContainer">
+                        <Spinner animation="border" variant="primary" />    
+                    </div>
                 </div>
             </div>
         )

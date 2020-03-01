@@ -55,18 +55,27 @@ export default class Todos extends React.PureComponent
         })
     }
 
+
     addTodo=()=>{
-        postServerWithDataAndAuth(ADDTODO,{
-            todoname:this.state.todoTitle, 
-            todocompleted:false, 
-            categoryid:this.props.category.id
-        }).then(res=>{
-            this.showToast(this.state.todoTitle + " Added!")
-            this.setState({todoTitle:""})
-            this.getTodoFromServer()
-        }).catch(err=>{
-            console.log(err)
-        })
+        if(this.state.todoTitle.length !== 0)
+        {
+            postServerWithDataAndAuth(ADDTODO,{
+                todoname:this.state.todoTitle, 
+                tododeadline:new Date(),
+                todocompleted:false, 
+                categoryid:this.props.category.id
+            }).then(res=>{
+                this.showToast(this.state.todoTitle + " Added!")
+                this.setState({todoTitle:""})
+                this.getTodoFromServer()
+            }).catch(err=>{
+                console.log(err)
+            })
+        }
+        else
+        {
+            this.showToast("Empty todo cannot be added!")
+        }
     }
 
     deleteTodo = (index) =>{
@@ -104,6 +113,7 @@ export default class Todos extends React.PureComponent
                 modalShow : show, 
                 selectedTodo: selected
             })
+            
         }
         else
         { // close modal
@@ -149,37 +159,20 @@ export default class Todos extends React.PureComponent
                 <ul className="list-group">
                     {
                         this.state.data.map((v,i)=>{
-                            if(this.state.showTodos === 0 && !v.todoCompleted) // not completed
+                            if((this.state.showTodos === 0 && !v.todoCompleted) || (this.state.showTodos === 1 && v.todoCompleted)) // not completed
                             {
                                 return (
                                 <div className="input-group" key={i}>
                                     <div className="input-group-prepend">
                                         <div className="input-group-text">
-                                        <input id={i} type="checkbox" checked={false}
+                                        <input id={i} type="checkbox" checked={v.todoCompleted}
                                             onChange={(e)=>this.completeTodo(e.target.id)}/>
                                         </div>
                                     </div>
-                                    <input type="text" className="todoInput form-control" value={v.todoName} readOnly/>
-                                    <div className="input-group-append" id="button-addon4">
-                                        <button id={i} className="btn btn-outline-info" type="button"
-                                        onClick={(e)=>this.setModalShow(true,e.target.id)}>Edit</button>
-                                        <button id={i} className="btn btn-outline-danger" type="button"
-                                        onClick={(e)=>this.deleteTodo(e.target.id)}>Delete</button>
-                                    </div>
-                                </div>
-                                )
-                            }
-                            else if(this.state.showTodos === 1 && v.todoCompleted) // completed
-                            {
-                                return (
-                                <div className="input-group" key={i}>
-                                    <div className="input-group-prepend">
-                                        <div className="input-group-text">
-                                        <input id={i} type="checkbox" checked={true}
-                                            onChange={(e)=>this.completeTodo(e.target.id)}/>
-                                        </div>
-                                    </div>
-                                    <input type="text" className="todoInput form-control completedTodo" value={v.todoName} readOnly/>
+                                    <input type="text" id={i} 
+                                    className={`todoInput form-control ${v.todoCompleted ? "completedTodo" : ""} ${new Date(v.todoDeadline) < new Date().setHours(0,0,0,0) && !v.todoCompleted ? "delayed" : ""}`} 
+                                    value={v.todoName} readOnly onDoubleClick={(e)=>this.setModalShow(true,e.target.id)}
+                                    />
                                     <div className="input-group-append" id="button-addon4">
                                         <button id={i} className="btn btn-outline-info" type="button"
                                         onClick={(e)=>this.setModalShow(true,e.target.id)}>Edit</button>

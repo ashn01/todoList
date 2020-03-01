@@ -27,6 +27,7 @@ namespace TodoListWeb.Data.Repositories
         public Todo GetTodo(int id)
         {
             var result = _context.Todos.SingleOrDefault(l => id == (l.ID));
+
             return result;
         }
         public IEnumerable<Todo> GetAllTodosById(int id)

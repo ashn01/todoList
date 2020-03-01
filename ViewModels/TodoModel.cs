@@ -11,7 +11,7 @@ namespace TodoListWeb.ViewModels
         public int ID { get; set; }
         public string TodoName { get; set; }
         public string TodoDescription { get; set; }
-        public DateTime TodoDeadline { get; set; }
+        public DateTimeOffset TodoDeadline { get; set; }
         public bool TodoCompleted { get; set; }
         [Required]
         public int CategoryId { get; set; }

@@ -5,11 +5,13 @@ import Todos from './Todos'
 import CategoryModal from './CategoryModal'
 import {postServerWithDataAndAuth , GETCATEGORY} from '../../APIROUTE'
 import {store} from '../../store'
+import { connect } from "react-redux";
+import { isLoading } from "../../Stores/Reducers/loading";
 
 import '../../css/Category.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default class Category extends React.PureComponent
+class Category extends React.PureComponent
 {
     constructor(props) {
         super(props);
@@ -30,11 +32,15 @@ export default class Category extends React.PureComponent
     getCategoryFromServer()
     {
         var info = store.getState().userInfo
-        
+        this.setState({isLoaded:false},()=>{
+            this.props.isLoading(this.state.isLoaded) // reducer
+        })
+
         postServerWithDataAndAuth(GETCATEGORY,{
             id:info.id
         }).then(res=>{
             this.setState({category : res.data.categories, isLoaded:true},()=>{
+                this.props.isLoading(this.state.isLoaded) // reducer
                 $('.nav .categoryPanel').click((e)=>{
                     $('.nav .categoryPanel div.active').removeClass('active');
                     $(e.target).addClass('active');
@@ -87,7 +93,7 @@ export default class Category extends React.PureComponent
                     })
                 }
                 <li className="nav-item">
-                    <div className="category nav-link" onClick={this.addCategory} onClick = {()=>this.setModalShow(true,undefined,true,undefined)}>
+                    <div className="category nav-link" onClick = {()=>this.setModalShow(true,undefined,true,undefined)}>
                         +
                     </div>
                 </li>
@@ -104,8 +110,15 @@ export default class Category extends React.PureComponent
                                 undefined
                             :   this.state.category[this.state.selectedCategory]
                             }/>
+            
         </div>
         
         )
     }
 }
+
+
+export default connect(
+    null,
+    {isLoading}
+)(Category)

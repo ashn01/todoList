@@ -3,6 +3,13 @@
     background-color: #ffffff;
 }
 
+.todoInput.form-control[readonly].delayed
+{
+    background-color: #ffeaea;
+}
+
+
+
 .completedTodo
 {
     text-decoration: line-through;
