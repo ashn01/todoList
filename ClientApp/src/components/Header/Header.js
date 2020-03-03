@@ -1,7 +1,8 @@
 import React from 'react'
 import { Link, Redirect } from 'react-router-dom';
 import $ from 'jquery'
-import {store} from '../../store'
+
+import {store, persistor} from '../../store'
 import { connect } from "react-redux";
 import { setHeader } from "../../Stores/Reducers/headerPanel";
 
@@ -22,22 +23,28 @@ class Header extends React.PureComponent
           panelIndex : 0,
           toLogin: false
         };
+        this.unsubscribe = store.subscribe(()=>{
+            this.setState({
+                panelIndex : store.getState().headerPanel.index
+            })
+        })
     }
 
     componentDidMount() 
     {
         var info = store.getState().userInfo
         this.setState({currentUser:info})
-        $('#headNav .nav-item').click((e)=>{
-            $('#headNav .nav-item').removeClass('active');
-            $(e.target).addClass('active');
-        })
 
         authenticationService.validate().then(res=>{
             //console.log(res)
         }).catch(err=>{
             this.setState({toLogin:true})
         })
+    }
+
+    componentWillUnmount()
+    {
+        this.unsubscribe()
     }
 
     handleSwitch = (index) =>{
@@ -48,7 +55,8 @@ class Header extends React.PureComponent
 
     logout=()=> {
         authenticationService.logout()
-        this.setState({toLogin : true})
+        persistor.purge()
+        //this.setState({toLogin : true})
     }
 
     render()
@@ -62,10 +70,10 @@ class Header extends React.PureComponent
                 <div className="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
                     <ul id="headNav" className="navbar-nav mr-auto">
                         <li className="nav-item">
-                            <Link to="/home" onClick={()=>this.handleSwitch(0)} className="nav-item nav-link active">OnGoing</Link>
+                            <Link to="/home" onClick={()=>this.handleSwitch(0)} className={`nav-item nav-link ${this.state.panelIndex===0 ? "active" :""}`}>OnGoing</Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/home" onClick={()=>this.handleSwitch(1)} className="nav-item nav-link">Completed</Link>
+                            <Link to="/home" onClick={()=>this.handleSwitch(1)} className={`nav-item nav-link ${this.state.panelIndex===1 ? "active" :""}`}>Completed</Link>
                         </li>
                     </ul>
                 </div>

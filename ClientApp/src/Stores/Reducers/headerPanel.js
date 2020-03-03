@@ -1,3 +1,4 @@
+import { PURGE } from "redux-persist";
 const SET_HEADER = 'headerPanel/SET_HEADER';
 
 export const setHeader = (index) => ({ 
@@ -7,7 +8,7 @@ export const setHeader = (index) => ({
     } });
 
 const initialState = {
-  id : 0
+  index : 0
 }
 
 export default function (state = initialState, action) {
@@ -18,6 +19,9 @@ export default function (state = initialState, action) {
           ...state,
           index:index
         };
+        
+      case PURGE:
+        return initialState
       default:
         return state;
     }

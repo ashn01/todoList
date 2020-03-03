@@ -17,14 +17,14 @@ namespace TodoListWeb.Controllers
     [Route("api/[controller]")]
     public class CategoryController : ControllerBase
     {
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly INewCategoryRepository _newCategoryRepository;
         private IMapper _mapper;
         private IUserService _userService;
-        public CategoryController(ICategoryRepository categoryRepository,
+        public CategoryController(INewCategoryRepository newCategoryRepository,
                                     IMapper mapper,
                                     IUserService userService)
         {
-            _categoryRepository = categoryRepository;
+            _newCategoryRepository = newCategoryRepository;
             _mapper = mapper;
             _userService = userService;
         }
@@ -39,10 +39,11 @@ namespace TodoListWeb.Controllers
             {
                 try
                 {
-                    IEnumerable<Category> cates = _categoryRepository.GetAllCategoriesById(model.Id);
+                    IEnumerable<NewCategory> cates = _newCategoryRepository.GetAllCategoriesById(model.Id);
 
-                    var categories = _mapper.Map<IEnumerable<CategoryModel>>(cates);
+                    var categories = _mapper.Map<IEnumerable<NewCategoryModel>>(cates);
 
+                    //return new JsonResult(categories);
                     return Ok(new { categories });
                 }
                 catch (Exception ex)
@@ -57,19 +58,25 @@ namespace TodoListWeb.Controllers
 
         [AllowAnonymous]
         [HttpPost("add")]
-        public IActionResult Create([FromBody]CategoryModel model)
+        public IActionResult Create([FromBody]NewCategoryModel model)
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
             if (_userService.Validate(token))
             {
-                var category = _mapper.Map<Category>(model);
+                var category = _mapper.Map<NewCategory>(model);
 
                 try
                 {
-                    _categoryRepository.AddCategory(category);
-                    _categoryRepository.Save();
-                    return Ok();
+                    _newCategoryRepository.AddCategory(category);
+                    _newCategoryRepository.Save();
+
+                    IEnumerable<NewCategory> cates = _newCategoryRepository.GetAllCategoriesById(model.Owner);
+
+                    var categories = _mapper.Map<IEnumerable<NewCategoryModel>>(cates);
+
+                    //return new JsonResult(categories);
+                    return Ok(new { categories });
                 }
                 catch (Exception ex)
                 {
@@ -83,20 +90,26 @@ namespace TodoListWeb.Controllers
 
         [AllowAnonymous]
         [HttpPost("deleteById")]
-        public IActionResult Delete([FromBody]CategoryModel model) // delete Category by category id
+        public IActionResult Delete([FromBody]NewCategoryModel model) // delete Category by category id
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
             if (_userService.Validate(token))
             {
-                Category ret = _categoryRepository.GetCategory(model.Id);
+                NewCategory ret = _newCategoryRepository.GetCategory(model.Id);
                 if (ret != null)
                 {
                     try
                     {
-                        _categoryRepository.DeleteWithTodos(ret);
-                        _categoryRepository.Save();
-                        return Ok();
+                        _newCategoryRepository.DeleteWithTodos(ret);
+                        _newCategoryRepository.Save();
+
+                        IEnumerable<NewCategory> cates = _newCategoryRepository.GetAllCategoriesById(model.Owner);
+
+                        var categories = _mapper.Map<IEnumerable<NewCategoryModel>>(cates);
+
+                        //return new JsonResult(categories);
+                        return Ok(new { categories });
                     }
                     catch (Exception ex)
                     {
@@ -110,10 +123,11 @@ namespace TodoListWeb.Controllers
             else
                 return Unauthorized(new { message = "Invalid Token" });
         }
+        
 
         [AllowAnonymous]
         [HttpPost("editById")]
-        public IActionResult Edit([FromBody]CategoryModel model) // delete Category by category id
+        public IActionResult Edit([FromBody]NewCategoryModel model) // delete Category by category id
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
@@ -121,10 +135,16 @@ namespace TodoListWeb.Controllers
             {
                 try
                 {
-                    var category = _mapper.Map<Category>(model);
-                    _categoryRepository.Edit(category);
-                    _categoryRepository.Save();
-                    return Ok();
+                    var category = _mapper.Map<NewCategory>(model);
+                    _newCategoryRepository.Edit(category);
+                    _newCategoryRepository.Save();
+
+                    IEnumerable<NewCategory> cates = _newCategoryRepository.GetAllCategoriesById(model.Owner);
+
+                    var categories = _mapper.Map<IEnumerable<NewCategoryModel>>(cates);
+
+                    //return new JsonResult(categories);
+                    return Ok(new { categories });
                 }
                 catch (Exception ex)
                 {

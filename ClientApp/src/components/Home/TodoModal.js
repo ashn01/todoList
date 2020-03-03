@@ -1,11 +1,13 @@
 import React, {useState} from 'react'
-import {Modal, Button, InputGroup, FormControl} from 'react-bootstrap'
+import {Modal, Button, InputGroup, FormControl, Form} from 'react-bootstrap'
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker'
+import $ from 'jquery'
 
 import {postServerWithDataAndAuth, MODIFYTODO, DELETETODO} from '../../APIROUTE'
 
 import "react-datepicker/dist/react-datepicker.css";
+import '../../css/Todo.css'
 
 export default function TodoModal(props) {
     const [todoId, setTodoId] = useState(props.todo !== undefined ? 
@@ -24,17 +26,19 @@ export default function TodoModal(props) {
                                                         props.todo.todoCompleted 
                                                     :   "");     
     const [todoCategoryId, setCategoryId] = useState(props.todo !== undefined ? 
-                                                        props.todo.CategoryId 
-                                                    :   "");                                                             
+                                                        props.todo.newCategoryId 
+                                                    :   "");  
+    $('.react-datepicker-wrapper').addClass('form-control'); // add class                                                  
     React.useEffect(()=>{
         if(props.todo !== undefined)
         {
+            console.log(props)
             setTodoName(props.todo.todoName);
             setTodoId(props.todo.id);
             setTodoDeadline(new Date(props.todo.todoDeadline));
             setTodoDescription(props.todo.todoDescription);
             setTodoCompleted(props.todo.todoCompleted);
-            setCategoryId(props.todo.categoryId);
+            setCategoryId(props.todo.newCategoryId);
         }
         else
         {
@@ -53,10 +57,10 @@ export default function TodoModal(props) {
                 todoDescription:todoDescription,
                 tododeadline:todoDeadline,
                 TodoCompleted:todoCompleted,
-                categoryid:todoCategoryId
+                newcategoryid:todoCategoryId
             }).then(res => {
                 showToast(props.todo.todoName + " Edited!")
-                props.onHide(true) // true to update
+                props.onHide(res) // true to update
             })
         }else
         {
@@ -118,13 +122,13 @@ export default function TodoModal(props) {
                 <InputGroup.Prepend className="todoModalPrepand">
                     <InputGroup.Text className="todoModalText">Deadline</InputGroup.Text>
                 </InputGroup.Prepend>
-                    <DatePicker className="form-control todoModalText" selected={todoDeadline} onChange={date => setTodoDeadline(date)}
+                    <DatePicker className="datePicker todoModalText" selected={todoDeadline} onChange={date => setTodoDeadline(date)}
                                 dateFormat="MM-dd-yyyy hh:mm aa" showTimeInput timeInputLabel="Time:" showYearDropdown/>
-                <InputGroup.Prepend>
+                
+                <InputGroup.Append>
                 <Button onClick={()=>setTodoDeadline(new Date())}>Today</Button>
-                    <InputGroup.Checkbox checked={todoCompleted} onChange={(e)=>setTodoCompleted(e.target.checked)}/>
-                    <InputGroup.Text>Completed</InputGroup.Text>
-                </InputGroup.Prepend>
+                
+                </InputGroup.Append>
             </InputGroup>
         </Modal.Body>
         <Modal.Footer>
@@ -136,7 +140,7 @@ export default function TodoModal(props) {
                 props.todo !== undefined &&
                     <Button onClick={modifyTodo}>Edit</Button>
             }
-            <Button onClick={props.onHide}>Close</Button>
+            <Button onClick={()=>props.onHide(undefined)}>Close</Button>
         </Modal.Footer>
       </Modal>
     );

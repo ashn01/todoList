@@ -1,14 +1,15 @@
 import React from 'react'
 import TodoModal from './TodoModal'
 import { toast } from 'react-toastify';
-
+import { connect } from "react-redux";
 
 import {postServerWithDataAndAuth , ADDTODO, GETTODO, DELETETODO, MODIFYTODO } from '../../APIROUTE'
 import {store} from '../../store'
+import { setTodos} from "../../Stores/Reducers/categories";
 
 import '../../css/Todo.css'
 
-export default class Todos extends React.PureComponent
+class Todos extends React.PureComponent
 {
     constructor(props) {
         super(props);
@@ -17,19 +18,21 @@ export default class Todos extends React.PureComponent
             modalShow : false,
             selectedTodo:0,
             data :[],
-            showTodos:0
+            needUpdate : 0,
+            showTodos : store.getState().headerPanel.index
         }
         this.unsubscribe = store.subscribe(()=>{
-            this.setState({showTodos:store.getState().headerPanel.index})
+            const data = store.getState().categoryReducer.categories[this.props.categoryIndex] ? store.getState().categoryReducer.categories[this.props.categoryIndex].todos : []
+            this.setState({
+                data:data,
+                showTodos:store.getState().headerPanel.index
+            })
         })
     }
 
     componentDidMount()
     {
-        if(this.props.category)
-        {
-            this.getTodoFromServer()
-        }
+        this.setState({data:this.props.category.todos})
     }
 
     componentWillUnmount()
@@ -39,22 +42,11 @@ export default class Todos extends React.PureComponent
 
     componentDidUpdate(prevProps)
     {
-        if(this.props.category && prevProps.category !== this.props.category)
+        if(this.props.category && prevProps.category.todos !== this.props.category.todos)
         { // update if category changed
-            this.getTodoFromServer()
+            this.setState({data:this.props.category.todos})
         }
     }
-    
-    getTodoFromServer()
-    {
-        
-        postServerWithDataAndAuth(GETTODO,{
-            id:this.props.category.id
-        }).then(res=>{
-            this.setState({data:res.data.todos})
-        })
-    }
-
 
     addTodo=()=>{
         if(this.state.todoTitle.length !== 0)
@@ -63,11 +55,11 @@ export default class Todos extends React.PureComponent
                 todoname:this.state.todoTitle, 
                 tododeadline:new Date(),
                 todocompleted:false, 
-                categoryid:this.props.category.id
+                newcategoryid:this.props.category.id
             }).then(res=>{
+                this.props.setTodos(res.data.todos,this.props.category.id)
                 this.showToast(this.state.todoTitle + " Added!")
                 this.setState({todoTitle:""})
-                this.getTodoFromServer()
             }).catch(err=>{
                 console.log(err)
             })
@@ -82,10 +74,10 @@ export default class Todos extends React.PureComponent
         postServerWithDataAndAuth(DELETETODO,{
             id : this.state.data[index].id, 
             todoname:this.state.data[index].todoName,
-            categoryid:this.props.category.id
+            newcategoryid:this.props.category.id
         }).then(res=>{
+            this.props.setTodos(res.data.todos,this.props.category.id)
             this.showToast(this.state.data[index].todoName + " Deleted!")
-            this.getTodoFromServer()
         }).catch(err=>{
             console.log(err)
         })
@@ -98,15 +90,18 @@ export default class Todos extends React.PureComponent
             todoDescription:this.state.data[index].todoDescription,
             tododeadline:this.state.data[index].todoDeadline,
             TodoCompleted:!this.state.data[index].todoCompleted,
-            categoryid:this.props.category.id
+            newcategoryid:this.props.category.id
         }).then(res => {
-            var content = this.state.data[index].todoName + (this.state.data[index].todoCompleted ? " Not Completed!" : " Completed!")
+            this.props.setTodos(res.data.todos,this.props.category.id)
+            var content = this.state.data[index].todoName + (!this.state.data[index].todoCompleted ? " Not Completed!" : " Completed!")
             this.showToast(content)
-            this.getTodoFromServer()
+            
+            this.setState({data:res.data.todos,todoTitle:""})
+            //this.getTodoFromServer()
         })
     }
 
-    setModalShow = (show,selected,update) => {
+    setModalShow = (show,selected,data) => {
         if(show)
         { // show modal
             this.setState({
@@ -122,9 +117,9 @@ export default class Todos extends React.PureComponent
             })
         }
         // update state from server
-        if(update === true)
+        if(data !== undefined)
         {
-            this.getTodoFromServer()
+            this.props.setTodos(data.data.todos,this.props.category.id)
         }
     }
 
@@ -158,6 +153,7 @@ export default class Todos extends React.PureComponent
                 <hr/>
                 <ul className="list-group">
                     {
+                        this.state.data && this.state.data &&
                         this.state.data.map((v,i)=>{
                             if((this.state.showTodos === 0 && !v.todoCompleted) || (this.state.showTodos === 1 && v.todoCompleted)) // not completed
                             {
@@ -188,10 +184,18 @@ export default class Todos extends React.PureComponent
                     }
                 </ul>
                 <TodoModal  show={this.state.modalShow} 
-                            onHide={(update)=>this.setModalShow(false,undefined,update)} 
+                            onHide={(data)=>this.setModalShow(false,undefined,data)} 
                             todo={this.state.data[this.state.selectedTodo]}
                             />
             </div>
         )
     }
 }
+
+export default connect(
+    null,
+    {setTodos}
+)(Todos)
+
+/*
+*/

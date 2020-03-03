@@ -29,6 +29,12 @@ namespace TodoListWeb.Data.Repositories
             var result = _context.Categories.SingleOrDefault(l => id == (l.ID));
             return result;
         }
+        public IEnumerable<Category> GetAllCategoriesAndTodosById(string id)
+        {
+            var result = _context.Categories.Where(l => id.Contains(l.Owner)).ToList();
+            return result;
+        }
+
         public IEnumerable<Category> GetAllCategoriesById(string id)
         {
             var result = _context.Categories.Where(l => id.Contains(l.Owner)).ToList();

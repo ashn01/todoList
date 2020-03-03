@@ -1,3 +1,4 @@
+import { PURGE } from "redux-persist";
 const SET_USERINFO = 'userInfo/SET_USERINFO';
 
 export const setInfo = (id, email, firstName, lastName) => ({ type: SET_USERINFO,
@@ -26,6 +27,8 @@ export default function (state = initialState, action) {
           firstName : firstName,
           lastName : lastName
         };
+      case PURGE:
+        return initialState
       default:
         return state;
     }

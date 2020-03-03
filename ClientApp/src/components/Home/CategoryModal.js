@@ -1,11 +1,14 @@
 import React, {useState} from 'react'
 import {Modal, Button, InputGroup, FormControl, Alert} from 'react-bootstrap'
 import { toast } from 'react-toastify';
+import { connect } from "react-redux";
+
+import * as categories from "../../Stores/Reducers/categories";
 import {postServerWithDataAndAuth , ADDCATEGORY, MODIFYCATEGORY, DELETECATEGORY} from '../../APIROUTE'
 
 import {store} from '../../store'
 
-export default function CategoryModal(props) {
+function CategoryModal(props) {
     const [categoryName, setCategoryName] = useState(props.category !== undefined ? 
                                                         props.category.categoryName 
                                                     :   "");
@@ -35,7 +38,7 @@ export default function CategoryModal(props) {
             categoryname:categoryName
         }).then(res => {
             showToast(props.category.categoryName + " category modified!")
-            props.onHide(true) // true to update
+            props.onHide(res) // true to update
         })
     }
     const addCategory = () =>{
@@ -49,7 +52,7 @@ export default function CategoryModal(props) {
                 showToast(categoryName + " category added!")
                 setCategoryName("");
                 setCategoryId(-1);
-                props.onHide(true) // true to update
+                props.onHide(res,"add") // true to update
             })
         }
         else
@@ -64,7 +67,7 @@ export default function CategoryModal(props) {
             id: categoryId
         }).then(res => {
             showToast(categoryName + " category deleted!")
-            props.onHide(true) // true to update
+            props.onHide(res,"delete") // true to update
         })
     }
 
@@ -105,11 +108,11 @@ export default function CategoryModal(props) {
             }
             {
                 props.category !== undefined ?
-                    <Button onClick={modifyCategory}>Modify</Button>
+                    <Button onClick={()=>modifyCategory()}>Modify</Button>
                 :
-                    <Button onClick={addCategory}>Add</Button>
+                    <Button onClick={()=>addCategory()}>Add</Button>
             }
-            <Button onClick={props.onHide}>Close</Button>
+            <Button onClick={()=>props.onHide(undefined, false)}>Close</Button>
         </Modal.Footer>
 
         <Alert show={showAlert} variant="danger">
@@ -119,7 +122,7 @@ export default function CategoryModal(props) {
             </p>
             <hr />
             <div className="d-flex justify-content-between">
-                <Button onClick={deleteCategory} variant="outline-danger">
+                <Button onClick={()=>deleteCategory()} variant="outline-danger">
                     Delete Anyway
                 </Button>
                 <Button onClick={() => setShowAlert(false)} variant="outline-primary">
@@ -131,3 +134,9 @@ export default function CategoryModal(props) {
       </Modal>
     );
   }
+
+
+export default connect(
+    null,
+    {categories}
+)(CategoryModal)

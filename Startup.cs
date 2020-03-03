@@ -80,6 +80,8 @@ namespace TodoListWeb
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ITodoRepository, TodoRepository>();
+            services.AddScoped<INewCategoryRepository, NewCategoryRepository>();
+            services.AddScoped<INewTodoRepository, NewTodoRepository>();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -124,7 +126,7 @@ namespace TodoListWeb
 
                 if (env.IsDevelopment())
                 {
-                    spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+                    spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
         }

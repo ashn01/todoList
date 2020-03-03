@@ -17,33 +17,38 @@ namespace TodoListWeb.Controllers
     [Route("api/[controller]")]
     public class TodoController : ControllerBase
     {
-        private readonly ITodoRepository _todoRepository;
+        private readonly INewTodoRepository _newTodoRepository;
         private IMapper _mapper;
         private IUserService _userService;
         public TodoController(IMapper mapper,
                               IUserService userService,
-                              ITodoRepository todoRepository)
+                              INewTodoRepository newTodoRepository)
         {
             _mapper = mapper;
             _userService = userService;
-            _todoRepository = todoRepository;
+            _newTodoRepository = newTodoRepository;
         }
 
         [AllowAnonymous]
         [HttpPost("add")]
-        public IActionResult Create([FromBody]TodoModel model)
+        public IActionResult Create([FromBody]NewTodoModel model)
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
             if (_userService.Validate(token))
             {
-                var todo = _mapper.Map<Todo>(model);
+                var todo = _mapper.Map<NewTodo>(model);
 
                 try
                 {
-                    _todoRepository.AddTodo(todo);
-                    _todoRepository.Save();
-                    return Ok();
+                    _newTodoRepository.AddTodo(todo);
+                    _newTodoRepository.Save();
+
+                    IEnumerable<NewTodo> todoList = _newTodoRepository.GetAllTodosById(model.NewCategoryId);
+
+                    var todos = _mapper.Map<IEnumerable<NewTodo>>(todoList);
+
+                    return Ok(new { todos });
                 }
                 catch (Exception ex)
                 {
@@ -57,20 +62,25 @@ namespace TodoListWeb.Controllers
 
         [AllowAnonymous]
         [HttpPost("deleteById")]
-        public IActionResult Delete([FromBody]TodoModel model) // delete Todo by id
+        public IActionResult Delete([FromBody]NewTodoModel model) // delete Todo by id
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
             if (_userService.Validate(token))
             {
-                Todo ret = _todoRepository.GetTodo(model.ID);
+                NewTodo ret = _newTodoRepository.GetTodo(model.ID);
                 if (ret != null)
                 {
                     try
                     {
-                        _todoRepository.Delete(ret);
-                        _todoRepository.Save();
-                        return Ok();
+                        _newTodoRepository.Delete(ret);
+                        _newTodoRepository.Save();
+
+                        IEnumerable<NewTodo> todoList = _newTodoRepository.GetAllTodosById(model.NewCategoryId);
+
+                        var todos = _mapper.Map<IEnumerable<NewTodo>>(todoList);
+
+                        return Ok(new { todos });
                     }
                     catch (Exception ex)
                     {
@@ -87,7 +97,7 @@ namespace TodoListWeb.Controllers
 
         [AllowAnonymous]
         [HttpPost("getById")]
-        public IActionResult GetById([FromBody]CategoryModel model)
+        public IActionResult GetById([FromBody]NewCategoryModel model)
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
@@ -95,9 +105,9 @@ namespace TodoListWeb.Controllers
             {
                 try
                 {
-                    IEnumerable<Todo> ret = _todoRepository.GetAllTodosById(model.Id);
+                    IEnumerable<NewTodo> todoList = _newTodoRepository.GetAllTodosById(model.Id);
 
-                    var todos = _mapper.Map<IEnumerable<Todo>>(ret);
+                    var todos = _mapper.Map<IEnumerable<NewTodo>>(todoList);
 
                     return Ok(new { todos });
                 }
@@ -113,7 +123,7 @@ namespace TodoListWeb.Controllers
 
         [AllowAnonymous]
         [HttpPost("editById")]
-        public IActionResult Edit([FromBody]TodoModel model) // delete Category by category id
+        public IActionResult Edit([FromBody]NewTodoModel model) // delete Category by category id
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
@@ -121,10 +131,16 @@ namespace TodoListWeb.Controllers
             {
                 try
                 {
-                    var todo = _mapper.Map<Todo>(model);
-                    _todoRepository.Edit(todo);
-                    _todoRepository.Save();
-                    return Ok();
+                    var todo = _mapper.Map<NewTodo>(model);
+                    _newTodoRepository.Edit(todo);
+                    _newTodoRepository.Save();
+
+                    IEnumerable<NewTodo> todoList = _newTodoRepository.GetAllTodosById(model.NewCategoryId);
+
+                    var todos = _mapper.Map<IEnumerable<NewTodo>>(todoList);
+
+                    return Ok(new { todos });
+
                 }
                 catch (Exception ex)
                 {

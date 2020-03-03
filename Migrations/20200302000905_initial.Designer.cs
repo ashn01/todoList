@@ -10,7 +10,7 @@ using TodoListWeb.Data;
 namespace TodoListWeb.Migrations
 {
     [DbContext(typeof(TodoListContext))]
-    [Migration("20200228021354_initial")]
+    [Migration("20200302000905_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -170,6 +170,53 @@ namespace TodoListWeb.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("TodoListWeb.Models.NewCategory", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Owner")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("NewCategories");
+                });
+
+            modelBuilder.Entity("TodoListWeb.Models.NewTodo", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("NewCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("TodoCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset>("TodoDeadline")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("TodoDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TodoName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("NewCategoryId");
+
+                    b.ToTable("NewTodos");
+                });
+
             modelBuilder.Entity("TodoListWeb.Models.Todo", b =>
                 {
                     b.Property<int>("ID")
@@ -183,8 +230,8 @@ namespace TodoListWeb.Migrations
                     b.Property<bool>("TodoCompleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("TodoDeadline")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("TodoDeadline")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("TodoDescription")
                         .HasColumnType("nvarchar(max)");
@@ -323,6 +370,15 @@ namespace TodoListWeb.Migrations
                     b.HasOne("TodoListWeb.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TodoListWeb.Models.NewTodo", b =>
+                {
+                    b.HasOne("TodoListWeb.Models.NewCategory", null)
+                        .WithMany("todos")
+                        .HasForeignKey("NewCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

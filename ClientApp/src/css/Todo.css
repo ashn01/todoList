@@ -8,9 +8,12 @@
     background-color: #ffeaea;
 }
 
-
-
 .completedTodo
 {
     text-decoration: line-through;
+}
+
+.datePicker
+{
+    border: none;
 }

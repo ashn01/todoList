@@ -1,3 +1,4 @@
+import { PURGE } from "redux-persist";
 const IS_LOADING = 'loading/IS_LOADING';
 
 export const isLoading = (isloading) => ({ 
@@ -7,7 +8,7 @@ export const isLoading = (isloading) => ({
     } });
 
 const initialState = {
-  id : 0
+  isloading : false
 }
 
 export default function (state = initialState, action) {
@@ -18,6 +19,8 @@ export default function (state = initialState, action) {
           ...state,
           isloading:isloading
         };
+      case PURGE:
+        return initialState
       default:
         return state;
     }

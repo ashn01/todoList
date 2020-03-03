@@ -7,6 +7,7 @@ import {postServerWithDataAndAuth , GETCATEGORY} from '../../APIROUTE'
 import {store} from '../../store'
 import { connect } from "react-redux";
 import { isLoading } from "../../Stores/Reducers/loading";
+import { setCategories, setSelectedCategory} from "../../Stores/Reducers/categories";
 
 import '../../css/Category.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -20,8 +21,15 @@ class Category extends React.PureComponent
             modalShow : false,
             selectedCategory : 0,
             isNewCategory : false,
-            isLoaded: false
+            isLoaded : false
         }
+        this.unsubscribe = store.subscribe(()=>{
+            this.setState({
+                category:store.getState().categoryReducer.categories, 
+                selectedCategory:store.getState().categoryReducer.selectedCategory,
+                isLoaded : store.getState().isLoading.isloading
+            })
+        })
     }
 
     componentDidMount()
@@ -29,34 +37,47 @@ class Category extends React.PureComponent
         this.getCategoryFromServer()
     }
 
+    componentWillUnmount()
+    {
+        this.unsubscribe()
+    }
+
     getCategoryFromServer()
     {
         var info = store.getState().userInfo
-        this.setState({isLoaded:false},()=>{
-            this.props.isLoading(this.state.isLoaded) // reducer
-        })
+        this.props.isLoading(false) // reducer
+        
 
         postServerWithDataAndAuth(GETCATEGORY,{
             id:info.id
         }).then(res=>{
-            this.setState({category : res.data.categories, isLoaded:true},()=>{
-                this.props.isLoading(this.state.isLoaded) // reducer
-                $('.nav .categoryPanel').click((e)=>{
-                    $('.nav .categoryPanel div.active').removeClass('active');
-                    $(e.target).addClass('active');
-                    this.setState({selectedCategory : e.target.id >= this.state.category.length ? 0 : e.target.id})
-                });
-            })
+            this.updateCategories(res);
         })
     }
 
-    setModalShow = (show,selected,isNew,update) => {
+    updateCategories = (data) =>{
+            this.props.setCategories(data.data.categories)
+            this.props.isLoading(true) // reducer
+    }
+
+    forceSelect = (index) =>{
+        $('.nav .categoryPanel div.active').removeClass('active');
+        $('.nav').find('.categoryPanel').eq(index).children('div').addClass('active')
+    }
+
+    selectCategory = (e) =>{
+        this.props.setSelectedCategory(e.target.id)
+        $(e.target).parent().siblings().children().removeClass('active')
+        $(e.target).addClass('active')
+    }
+
+    setModalShow = (show,selected,isNew,update,forceSelect) => {
         if(show)
         { // show modal
             this.setState({
                 modalShow : show, 
-                selectedCategory: selected !== undefined ? selected.target.id : this.state.selectedCategory,
-                isNewCategory : isNew !== undefined ? isNew : false
+                selectedCategory: selected ? selected.target.id : this.state.selectedCategory,
+                isNewCategory : isNew
             })
         }
         else
@@ -65,11 +86,25 @@ class Category extends React.PureComponent
                 modalShow : show
             })
         }
-
-        // update state from server
+        //update data
         if(update !== undefined)
         {
-            this.getCategoryFromServer()
+            var index
+            if(forceSelect === "add") // select first category
+            {
+                index = this.state.category.length // select newly created category
+                this.props.setSelectedCategory(index)
+                this.updateCategories(update)
+                this.forceSelect(index)
+            }
+            else if(forceSelect === "delete")
+            {
+                index = this.state.selectedCategory < this.state.category.length-1 ?
+                        this.state.selectedCategory : this.state.selectedCategory-1
+                this.props.setSelectedCategory(index) // select right if possible, else left
+                this.updateCategories(update)
+                this.forceSelect(index)
+            }
         }
 
     }
@@ -79,46 +114,45 @@ class Category extends React.PureComponent
         return(
         <div className="card text-center">
             <div className="card-header">
-            <ul className="nav nav-tabs card-header-tabs">
-                {
-                    this.state.category.map((v,i)=>{
-                        return (
-                            <li className={`nav-item categoryPanel`} key={i} >
-                                <div className={`category nav-link ${i===0 ? "active" : ""}`}
-                                onDoubleClick={(e)=>this.setModalShow(true,e,false,undefined)} id={i}>
-                                    {v.categoryName} 
-                                </div>
-                            </li>
-                        )
-                    })
-                }
-                <li className="nav-item">
-                    <div className="category nav-link" onClick = {()=>this.setModalShow(true,undefined,true,undefined)}>
-                        +
-                    </div>
-                </li>
-            </ul>
+                <ul className="nav nav-tabs card-header-tabs">
+                    {
+                        this.state.category &&
+                        this.state.category.map((v,i)=>{
+                            return (
+                                <li className={`nav-item categoryPanel`} key={i} >
+                                    <div className={`category nav-link ${this.state.selectedCategory == i ? "active" : ""}`}
+                                    onClick={(e)=>this.selectCategory(e)}
+                                    onDoubleClick={(e)=>this.setModalShow(true,e,false,undefined)} id={i}>
+                                        {v.categoryName} 
+                                    </div>
+                                </li>
+                            )
+                        })
+                    }
+                    <li className="nav-item">
+                        <div className="category nav-link" onClick = {()=>this.setModalShow(true,undefined,true,undefined)}>
+                            +
+                        </div>
+                    </li>
+                </ul>
             </div>
             {
-                this.state.isLoaded &&
-                <Todos category={this.state.category[this.state.selectedCategory]}/>
+                this.state.isLoaded && this.state.category && this.state.category[this.state.selectedCategory] &&
+                <Todos category={this.state.category[this.state.selectedCategory]} categoryIndex={this.state.selectedCategory}/>
             }
             <CategoryModal  show={this.state.modalShow} 
-                            onHide={(update)=>this.setModalShow(false,undefined,false,update)} 
+                            onHide={(update,forceSelect)=>this.setModalShow(false,undefined,false,update,forceSelect)} 
                             category={
                                 this.state.isNewCategory ? 
                                 undefined
                             :   this.state.category[this.state.selectedCategory]
                             }/>
-            
         </div>
-        
         )
     }
 }
 
-
 export default connect(
     null,
-    {isLoading}
+    {isLoading, setCategories, setSelectedCategory}
 )(Category)
