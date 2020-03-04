@@ -24,6 +24,11 @@ class Login extends React.PureComponent
         }
 
     }
+
+    /*  handleSubmit(e:element)
+     *  send user email and password to server
+     *  if successful, redirect to home
+    */
     handleSubmit = (e) =>
     {
         e.preventDefault();
@@ -36,11 +41,17 @@ class Login extends React.PureComponent
         })
     }
 
+    /*  handleRegister()
+     *  redirect to register page
+    */
     handleRegister = () =>
     {
         this.setState({toRegister:true})
     }
 
+    /*  handleChange(e:element)
+     *  Change state with element value
+    */
     handleChange = (e) =>
     {
         this.setState({
@@ -50,6 +61,7 @@ class Login extends React.PureComponent
 
     componentDidMount()
     {
+        // after component mounted, it checks if token is valid then redirect to home
         authenticationService.validate().then(res=>{
             this.setState({toLogin:true})
         }).catch(err=>{

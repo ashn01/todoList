@@ -30,6 +30,11 @@ function CategoryModal(props) {
         setShowAlert(false)
     }, [props.category])
     
+    /*
+     * modifyCategory()
+     * send owner category, category id, and modified category name
+     * after modifying, modal closed and send categories data to parent function 
+    */
     const modifyCategory = () =>{
         var info = store.getState().userInfo
         postServerWithDataAndAuth(MODIFYCATEGORY, {
@@ -38,9 +43,15 @@ function CategoryModal(props) {
             categoryname:categoryName
         }).then(res => {
             showToast(props.category.categoryName + " category modified!")
-            props.onHide(res) // true to update
+            props.onHide(res, "modify") // true to update
         })
     }
+
+    /*
+     * addCategory()
+     * send owner category, and category name
+     * after adding, modal closed and send categories data to parent function 
+    */
     const addCategory = () =>{
         var info = store.getState().userInfo
         if(categoryName !== "")
@@ -60,6 +71,12 @@ function CategoryModal(props) {
             console.log("Category name is required")
         }
     }
+
+    /*
+     * deleteCategory()
+     * send owner category, and category id
+     * after deleting, modal closed and send categories data to parent function 
+    */
     const deleteCategory = () => {
         var info = store.getState().userInfo
         postServerWithDataAndAuth(DELETECATEGORY, {
@@ -71,6 +88,10 @@ function CategoryModal(props) {
         })
     }
 
+    /*
+     * showToast(content:string)
+     * showing toast with string
+    */
     const showToast = (content) =>{
         toast(content,{position:"top-right", 
                             autoClose: 3000, hideProgressBar:true, newestOnTop:true,
@@ -102,11 +123,11 @@ function CategoryModal(props) {
         </InputGroup>
         </Modal.Body>
         <Modal.Footer>
-            {
+            {   // if category is not undefined, shows delete button
                 props.category !== undefined && 
                 <Button variant="danger" onClick={() => setShowAlert(true)}>Delete</Button>
             }
-            {
+            {   // if category is not undefined, shows modify button, else shows add button
                 props.category !== undefined ?
                     <Button onClick={()=>modifyCategory()}>Modify</Button>
                 :
@@ -114,7 +135,7 @@ function CategoryModal(props) {
             }
             <Button variant="outline-primary" onClick={()=>props.onHide(undefined, false)}>Close</Button>
         </Modal.Footer>
-
+        
         <Alert show={showAlert} variant="danger">
             <Alert.Heading>This action is undoable.</Alert.Heading>
             <p>

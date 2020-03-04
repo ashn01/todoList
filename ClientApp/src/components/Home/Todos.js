@@ -24,27 +24,35 @@ class Todos extends React.PureComponent
         }
         this._isMounted = false;
         this.unsubscribe = store.subscribe(()=>{
-            const selectedCategoryIndex = store.getState().categoryReducer.selectedCategoryIndex
-            const data = store.getState().categoryReducer.categories[selectedCategoryIndex] ? 
-                    store.getState().categoryReducer.categories[selectedCategoryIndex].todos : []
-            
-            if(this._isMounted)
-            {
-                this.setState({
-                    todos:data ,
-                    showTodos:store.getState().headerPanel.index,
-                    selectedCategoryIndex: selectedCategoryIndex,
-                    selectedCategoryId:store.getState().categoryReducer.selectedCategoryId
-                })
-            }
+            this.setDataFromStore();
         })
+    }
+
+    /*  setDataFromStore()
+     *  get Data from store and set it to its state
+     *  it checks if this component is mounted, otherwise will not set data
+    */
+    setDataFromStore()
+    {
+        const selectedCategoryIndex = store.getState().categoryReducer.selectedCategoryIndex
+        const data = store.getState().categoryReducer.categories[selectedCategoryIndex] ? 
+                store.getState().categoryReducer.categories[selectedCategoryIndex].todos : []
+        
+        if(this._isMounted)
+        {
+            this.setState({
+                todos:data ,
+                showTodos:store.getState().headerPanel.index,
+                selectedCategoryIndex: selectedCategoryIndex,
+                selectedCategoryId:store.getState().categoryReducer.selectedCategoryId
+            })
+        }
     }
 
     componentDidMount()
     {
         this._isMounted = true;
-        const data = store.getState().categoryReducer.categories[this.state.selectedCategoryIndex].todos
-        this.setState({todos:data})
+        this.setDataFromStore()
     }
 
     componentWillUnmount()
@@ -53,6 +61,12 @@ class Todos extends React.PureComponent
         this.unsubscribe()
     }
 
+    
+    /*  addTodo=()
+     *  if todo name is not empty, send todo name, and current date, and categoryId to the server
+     *  after update db, it updates store with new data and shows toast.
+     *  also reset todo text input box
+    */
     addTodo=()=>{
         if(this.state.todoTitle.length !== 0)
         {
@@ -75,19 +89,29 @@ class Todos extends React.PureComponent
         }
     }
 
+    /*  deleteTodo(index:number)
+     *  send corresponding todo ID, name, and its categoryId
+     *  shows toast first
+     *  then, update store with data
+    */
     deleteTodo = (index) =>{
         postServerWithDataAndAuth(DELETETODO,{
             id : this.state.todos[index].id, 
             todoname:this.state.todos[index].todoName,
             newcategoryid:this.state.selectedCategoryId
         }).then(res=>{
-            this.props.setTodos(res.data.todos)
             this.showToast(this.state.category.todos[index].todoName + " Deleted!")
+            this.props.setTodos(res.data.todos)
         }).catch(err=>{
             console.log(err)
         })
     }
 
+    /*  completeTodo(index:number)
+     *  send corresponding todo ID, name, todoDescription, deadline, todocompleted and its categoryId
+     *  shows toast first
+     *  then, update store with data 
+    */
     completeTodo = (index) =>{
         postServerWithDataAndAuth(MODIFYTODO, {
             id:this.state.todos[index].id,
@@ -100,10 +124,13 @@ class Todos extends React.PureComponent
             var content = this.state.todos[index].todoName + (!this.state.todos[index].todoCompleted ? " Not Completed!" : " Completed!")
             this.props.setTodos(res.data.todos)
             this.showToast(content)
-            this.setState({todos:res.data.todos})
         })
     }
 
+    /*  setModalShow(show:boolean, selected:number, data:{})
+     *  depends on show, modal displayed with selected todo data
+     *  if data is not undefined which means update needed, update store
+    */
     setModalShow = (show,selected,data) => {
         if(show)
         { // show modal
@@ -125,6 +152,9 @@ class Todos extends React.PureComponent
         }
     }
 
+    /*  handleChange(e:element)
+     *  change state with corresponding data when element onChange fired
+    */
     handleChange = (e) =>
     {
         this.setState({
@@ -132,6 +162,9 @@ class Todos extends React.PureComponent
         })
     }
 
+    /*  showToast(content:string)
+     *  display toast with string
+    */
     showToast = (content) =>{
         toast(content,{position:"top-right", 
                             autoClose: 3000, hideProgressBar:true, newestOnTop:true,
@@ -157,6 +190,7 @@ class Todos extends React.PureComponent
                 <hr/>
                 <ul className="list-group">
                     {
+                        // todos shouldn't be undefined
                         this.state.todos &&
                         this.state.todos.map((v,i)=>{
                             if((this.state.showTodos === 0 && !v.todoCompleted) || (this.state.showTodos === 1 && v.todoCompleted)) // not completed
@@ -174,12 +208,12 @@ class Todos extends React.PureComponent
                                     />
                                     <div className="input-group-append" id="button-addon4">
                                         <button id={i} className="btn todoEditBtn" type="button"
-                                            onClick={(e)=>this.setModalShow(true,e.target.id)}>
-                                                <div className="editImg"></div>
+                                            onClick={(e)=>{this.setModalShow(true,e.target.id); console.log(e.target.id)}}>
+                                                <div id={i} className="editImg"></div>
                                         </button>
                                         <button id={i} className="btn todoDeleteBtn" type="button"
                                             onClick={(e)=>this.deleteTodo(e.target.id)}>
-                                                <div className="deleteImg"></div>
+                                                <div id={i} className="deleteImg"></div>
                                         </button>
                                     </div>
                                 </div>
@@ -191,6 +225,7 @@ class Todos extends React.PureComponent
                     }
                 </ul>
                 {
+                        // todos shouldn't be undefined
                     this.state.todos &&
                     <TodoModal  show={this.state.modalShow} 
                                 onHide={(data)=>this.setModalShow(false,undefined,data)} 
@@ -206,7 +241,3 @@ export default connect(
     null,
     {setTodos}
 )(Todos)
-
-/*
-                
-*/

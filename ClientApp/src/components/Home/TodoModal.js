@@ -28,11 +28,10 @@ export default function TodoModal(props) {
     const [todoCategoryId, setCategoryId] = useState(props.todo !== undefined ? 
                                                         props.todo.newCategoryId 
                                                     :   "");  
-    $('.react-datepicker-wrapper').addClass('form-control'); // add class                                                  
+    $('.react-datepicker-wrapper').addClass('form-control'); // add class to datepicker                                    
     React.useEffect(()=>{
         if(props.todo !== undefined)
         {
-            console.log(props)
             setTodoName(props.todo.todoName);
             setTodoId(props.todo.id);
             setTodoDeadline(new Date(props.todo.todoDeadline));
@@ -47,7 +46,10 @@ export default function TodoModal(props) {
         }
     }, [props.todo, props.show])
 
-    
+    /*  modifyTodo()
+     *  send modified data to server and showing toast
+     *  then, close modal
+    */
     const modifyTodo = () =>{
         if(todoName.length !== 0)
         {
@@ -69,6 +71,9 @@ export default function TodoModal(props) {
 
     }
     
+    /*  deleteTodo()
+     *  Not implemented
+    */
     const deleteTodo = () => {
         postServerWithDataAndAuth(DELETETODO, {
         }).then(res => {
@@ -76,6 +81,9 @@ export default function TodoModal(props) {
         })
     }
 
+    /*  showToast(content:string)
+     *  Displaying toast with string
+    */
     const showToast = (content) =>{
         toast(content,{position:"top-right", 
                             autoClose: 3000, hideProgressBar:true, newestOnTop:true,
@@ -132,11 +140,11 @@ export default function TodoModal(props) {
             </InputGroup>
         </Modal.Body>
         <Modal.Footer>
-            {
+            {   // delete is not implemented
                 //props.category !== undefined && 
                 //<Button variant="danger" onClick={() => setShowAlert(true)}>Delete</Button>
             }
-            {
+            {   // valid check
                 props.todo !== undefined &&
                     <Button variant="info" onClick={modifyTodo}>Edit</Button>
             }

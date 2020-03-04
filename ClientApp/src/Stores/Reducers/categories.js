@@ -28,8 +28,8 @@ export const setTodos = (todos) => ({
 
 const initialState = {
   categories : [],
-  selectedCategoryId : 0,
-  selectedCategoryIndex : 0
+  selectedCategoryId : -1,
+  selectedCategoryIndex : -1
 }
 
 export default function (state = initialState, action) {

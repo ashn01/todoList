@@ -11,10 +11,18 @@ export default class Main extends React.PureComponent
     {
         switch(this.props.contents)
         {
-            case 'home' : return <Home/>
-            case 'login' : return <Login/>
-            case 'register' : return <Register/>
-            default : return null
+            case 'home' : 
+            return <Home/> 
+            break;
+            case 'login' : 
+            return <Login/>
+            break;
+            case 'register' : 
+            return <Register/>
+            break;
+            default : 
+            return null
+            break;
         }
     }
 

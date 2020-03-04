@@ -18,6 +18,11 @@ export default class Register extends React.PureComponent
             toLogin : false
         }
     }
+
+    /*  handleSubmit(e:element)
+     *  send user info to server
+     *  if successful, redirect to login page
+    */
     handleSubmit = (e) =>
     {
         if (this.state.password === this.state.confirmPassword) 
@@ -39,11 +44,17 @@ export default class Register extends React.PureComponent
         }
     }
 
+    /*  handleLogin()
+     *  redirect to login page
+    */
     handleLogin = () =>
     {
         this.setState({toLogin:true})
     }
 
+    /*  handleChange(e:element)
+     *  Change state with element value
+    */
     handleChange = (e) =>
     {
         this.setState({
