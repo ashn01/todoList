@@ -1,9 +1,16 @@
 .todoInput.form-control[readonly]
 {
     background-color: #ffffff;
+    border-left: none;
 }
 
 .todoInput.form-control[readonly].delayed
+{
+    background-color: #ffeaea;
+    border-left: none;
+}
+
+.todoInput.delayed
 {
     background-color: #ffeaea;
 }

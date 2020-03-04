@@ -99,9 +99,10 @@ export default function TodoModal(props) {
         <Modal.Body>
             <InputGroup className="mb-3">
                 <InputGroup.Prepend className="todoModalPrepand">
-                    <InputGroup.Text className="todoModalText">Todo Name</InputGroup.Text>
+                    <InputGroup.Text className="todoModalText justify-content-center">Todo Name</InputGroup.Text>
                 </InputGroup.Prepend>
                 <FormControl
+                className="todoTextArea"
                 placeholder="Category name"
                 value = {todoName}
                 onChange={(e)=>setTodoName(e.target.value)}
@@ -110,7 +111,7 @@ export default function TodoModal(props) {
             </InputGroup>
             <InputGroup className="mb-3">
                 <InputGroup.Prepend className="todoModalPrepand">
-                    <InputGroup.Text className="todoModalText">Description</InputGroup.Text>
+                    <InputGroup.Text className="todoModalText justify-content-center">Description</InputGroup.Text>
                 </InputGroup.Prepend>
                 <FormControl 
                 as="textarea" 
@@ -120,14 +121,13 @@ export default function TodoModal(props) {
             </InputGroup>
             <InputGroup className="mb-3">
                 <InputGroup.Prepend className="todoModalPrepand">
-                    <InputGroup.Text className="todoModalText">Deadline</InputGroup.Text>
+                    <InputGroup.Text className="todoModalText justify-content-center">Deadline</InputGroup.Text>
                 </InputGroup.Prepend>
                     <DatePicker className="datePicker todoModalText" selected={todoDeadline} onChange={date => setTodoDeadline(date)}
                                 dateFormat="MM-dd-yyyy hh:mm aa" showTimeInput timeInputLabel="Time:" showYearDropdown/>
                 
                 <InputGroup.Append>
-                <Button onClick={()=>setTodoDeadline(new Date())}>Today</Button>
-                
+                    <Button variant="outline-secondary" onClick={()=>setTodoDeadline(new Date())}>Today</Button>
                 </InputGroup.Append>
             </InputGroup>
         </Modal.Body>
@@ -138,9 +138,9 @@ export default function TodoModal(props) {
             }
             {
                 props.todo !== undefined &&
-                    <Button onClick={modifyTodo}>Edit</Button>
+                    <Button variant="info" onClick={modifyTodo}>Edit</Button>
             }
-            <Button onClick={()=>props.onHide(undefined)}>Close</Button>
+            <Button variant="outline-info" onClick={()=>props.onHide(undefined)}>Close</Button>
         </Modal.Footer>
       </Modal>
     );

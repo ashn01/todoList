@@ -11,24 +11,25 @@ export const setCategories = (categories) => ({
     }
 });
 
-export const setSelectedCategory = (selectedCategory) =>({
+export const setSelectedCategory = (selectedCategoryId, selectedCategoryIndex) =>({
   type: SET_SELECTED_CATEGORY,
     payload:{
-      selectedCategory : selectedCategory
+      selectedCategoryId : selectedCategoryId,
+      selectedCategoryIndex : selectedCategoryIndex
     }
 })
 
-export const setTodos = (todos, categoryId) => ({
+export const setTodos = (todos) => ({
   type: SET_TODOS,
     payload:{
-      todos : todos,
-      categoryId : categoryId
+      todos : todos
     }
 })
 
 const initialState = {
   categories : [],
-  selectedCategory : 0
+  selectedCategoryId : 0,
+  selectedCategoryIndex : 0
 }
 
 export default function (state = initialState, action) {
@@ -40,16 +41,16 @@ export default function (state = initialState, action) {
           categories:categories
         };
       case SET_SELECTED_CATEGORY:
-        const {selectedCategory} = action.payload
+        const {selectedCategoryId, selectedCategoryIndex} = action.payload
       return {
         ...state,
-        selectedCategory : selectedCategory
+        selectedCategoryId : selectedCategoryId,
+        selectedCategoryIndex : parseInt(selectedCategoryIndex,10)
       };
       case SET_TODOS:
-        const {todos, categoryId} = action.payload
-        const index = state.categories.findIndex(c=>c.id === categoryId)
+        const {todos} = action.payload
         var list = state.categories
-        list[index].todos = todos
+        list[state.selectedCategoryIndex].todos = todos
         return {
           ...state,
           categories : list

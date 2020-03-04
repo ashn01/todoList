@@ -26,7 +26,7 @@ class Category extends React.PureComponent
         this.unsubscribe = store.subscribe(()=>{
             this.setState({
                 category:store.getState().categoryReducer.categories, 
-                selectedCategory:store.getState().categoryReducer.selectedCategory,
+                selectedCategory:store.getState().categoryReducer.selectedCategoryIndex,
                 isLoaded : store.getState().isLoading.isloading
             })
         })
@@ -66,7 +66,7 @@ class Category extends React.PureComponent
     }
 
     selectCategory = (e) =>{
-        this.props.setSelectedCategory(e.target.id)
+        this.props.setSelectedCategory(this.state.category[e.target.id].id,e.target.id)
         $(e.target).parent().siblings().children().removeClass('active')
         $(e.target).addClass('active')
     }
@@ -93,17 +93,17 @@ class Category extends React.PureComponent
             if(forceSelect === "add") // select first category
             {
                 index = this.state.category.length // select newly created category
-                this.props.setSelectedCategory(index)
                 this.updateCategories(update)
                 this.forceSelect(index)
+                this.props.setSelectedCategory(this.state.category[index].id,index)
             }
             else if(forceSelect === "delete")
             {
                 index = this.state.selectedCategory < this.state.category.length-1 ?
                         this.state.selectedCategory : this.state.selectedCategory-1
-                this.props.setSelectedCategory(index) // select right if possible, else left
                 this.updateCategories(update)
                 this.forceSelect(index)
+                this.props.setSelectedCategory(this.state.category[index].id,index)// select right if possible, else left
             }
         }
 
@@ -138,7 +138,8 @@ class Category extends React.PureComponent
             </div>
             {
                 this.state.isLoaded && this.state.category && this.state.category[this.state.selectedCategory] &&
-                <Todos category={this.state.category[this.state.selectedCategory]} categoryIndex={this.state.selectedCategory}/>
+                <Todos  category={this.state.category[this.state.selectedCategory]} 
+                        categoryIndex={this.state.selectedCategory}/>
             }
             <CategoryModal  show={this.state.modalShow} 
                             onHide={(update,forceSelect)=>this.setModalShow(false,undefined,false,update,forceSelect)} 
