@@ -1,12 +1,14 @@
 import {combineReducers} from 'redux'
 import userInfo from './Reducers/userInfo'
 import headerPanel from './Reducers/headerPanel'
-import isLoading from './Reducers/loading'
+import loadingReducer from './Reducers/loading'
 import categoryReducer from './Reducers/categories'
+import spinnerReducer from './Reducers/spinner'
 
 export default combineReducers ({
     userInfo,
     headerPanel,
-    isLoading,
-    categoryReducer
+    loadingReducer,
+    categoryReducer,
+    spinnerReducer
 })

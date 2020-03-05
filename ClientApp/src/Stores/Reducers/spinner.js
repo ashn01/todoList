@@ -1,25 +1,25 @@
 import { PURGE } from "redux-persist";
-const IS_LOADING = 'loading/IS_LOADING';
+const SHOW_SPINNER = 'spinner/SHOW_SPINNER';
 
-export const isLoading = (isloading) => ({ 
-  type: IS_LOADING,
+export const showSpinner = (show) => ({ 
+  type: SHOW_SPINNER,
     payload:{
-      isloading : isloading
+      show : show
     } 
 });
 
 
 const initialState = {
-  isloading : false
+  show : false
 }
 
 export default function (state = initialState, action) {
     switch (action.type) {
-      case IS_LOADING:
-        const {isloading} = action.payload
+      case SHOW_SPINNER:
+        const {show} = action.payload
         return {
           ...state,
-          isloading:isloading
+          show:show
         };
       case PURGE:
         return initialState

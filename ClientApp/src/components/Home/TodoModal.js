@@ -3,6 +3,7 @@ import {Modal, Button, InputGroup, FormControl} from 'react-bootstrap'
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker'
 import $ from 'jquery'
+import { useSelector, useDispatch } from "react-redux";
 
 import {postServerWithDataAndAuth, MODIFYTODO, DELETETODO} from '../../APIROUTE'
 
@@ -28,6 +29,9 @@ export default function TodoModal(props) {
     const [todoCategoryId, setCategoryId] = useState(props.todo !== undefined ? 
                                                         props.todo.newCategoryId 
                                                     :   "");  
+    const store = useSelector(state => state); // get redux store
+    const dispatch = useDispatch()
+    
     $('.react-datepicker-wrapper').addClass('form-control'); // add class to datepicker                                    
     React.useEffect(()=>{
         if(props.todo !== undefined)

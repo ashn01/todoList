@@ -100,7 +100,7 @@ class Todos extends React.PureComponent
             todoname:this.state.todos[index].todoName,
             newcategoryid:this.state.selectedCategoryId
         }).then(res=>{
-            this.showToast(this.state.category.todos[index].todoName + " Deleted!")
+            this.showToast(this.state.todos[index].todoName + " Deleted!")
             this.props.setTodos(res.data.todos)
         }).catch(err=>{
             console.log(err)
@@ -223,7 +223,7 @@ class Todos extends React.PureComponent
                                         </div>
                                     </div>
                                     <div className="todoInputWrapper">
-                                        <div id={i} onDoubleClick={(e)=>this.setModalShow(true,e.target.id)} className={"todosTitle "+delay}>
+                                        <div id={i} onDoubleClick={(e)=>this.setModalShow(true,e.target.id)} className={`todosTitle ${delay} ${v.todoCompleted ? " completedTodo":""}`}>
                                             {v.todoName}
                                         </div>
                                         <div id={i} className={"todosDate "+delay} onDoubleClick={(e)=>this.setModalShow(true,e.target.id)}>
@@ -232,7 +232,7 @@ class Todos extends React.PureComponent
                                     </div>
                                     <div className="input-group-append" id="button-addon4">
                                         <button id={i} className="btn todoEditBtn" type="button"
-                                            onClick={(e)=>{this.setModalShow(true,e.target.id); console.log(e.target.id)}}>
+                                            onClick={(e)=>{this.setModalShow(true,e.target.id); }}>
                                                 <div id={i} className="editImg"></div>
                                         </button>
                                         <button id={i} className="btn todoDeleteBtn" type="button"
