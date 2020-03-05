@@ -171,6 +171,25 @@ class Todos extends React.PureComponent
                             closeOnClick: true, pauseOnHover: true, draggable: true})
     }
 
+    /*  showToast(date:Date)
+     *  formating date to 'DDD, MMM dd, yyyy hh:mm aa'
+    */
+    dateFormat = (date) =>{
+        var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        var d = new Date(date)
+        var doW = days[d.getDay()]
+        var mon = months[d.getMonth()]
+        var day = (d.getDay()+1)
+        var year = d.getFullYear()
+        var hour = d.getHours() % 12 ? d.getHours() % 12 : 12
+        var min = d.getMinutes()
+        hour = hour < 10 ? "0"+hour : hour
+        min = min < 10 ? "0"+min : min
+        var ampm = d.getHours() >= 12 ? 'pm' : 'am'
+        return doW+", "+mon+" "+day+", "+year+"  "+hour+":"+min+" "+ampm
+    }
     render()
     {
         return(
@@ -195,17 +214,22 @@ class Todos extends React.PureComponent
                         this.state.todos.map((v,i)=>{
                             if((this.state.showTodos === 0 && !v.todoCompleted) || (this.state.showTodos === 1 && v.todoCompleted)) // not completed
                             {
+                                const delay = new Date(v.todoDeadline) < new Date().setHours(0,0,0,0) && !v.todoCompleted ? "delayed" : ""
                                 return (
                                 <div className="input-group" key={i}>
                                     <div className="input-group-prepend">
-                                        <div className={`todoInput input-group-text checkboxWrapper ${new Date(v.todoDeadline) < new Date().setHours(0,0,0,0) && !v.todoCompleted ? "delayed" : ""}`}>
+                                        <div className={`todoInput input-group-text checkboxWrapper ${delay}`}>
                                             <div id={i} className={`checkboxImg ${v.todoCompleted ? "checked" :""}`} onClick={(e)=>this.completeTodo(e.target.id)}></div>
                                         </div>
                                     </div>
-                                    <input type="text" id={i} 
-                                    className={`todoInput form-control todosTextField ${v.todoCompleted ? "completedTodo" : ""} ${new Date(v.todoDeadline) < new Date().setHours(0,0,0,0) && !v.todoCompleted ? "delayed" : ""}`} 
-                                    value={v.todoName} readOnly onDoubleClick={(e)=>this.setModalShow(true,e.target.id)}
-                                    />
+                                    <div className="todoInputWrapper">
+                                        <div id={i} onDoubleClick={(e)=>this.setModalShow(true,e.target.id)} className={"todosTitle "+delay}>
+                                            {v.todoName}
+                                        </div>
+                                        <div id={i} className={"todosDate "+delay} onDoubleClick={(e)=>this.setModalShow(true,e.target.id)}>
+                                            {this.dateFormat(v.todoDeadline)}
+                                        </div>
+                                    </div>
                                     <div className="input-group-append" id="button-addon4">
                                         <button id={i} className="btn todoEditBtn" type="button"
                                             onClick={(e)=>{this.setModalShow(true,e.target.id); console.log(e.target.id)}}>

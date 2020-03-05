@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Modal, Button, InputGroup, FormControl, Form} from 'react-bootstrap'
+import {Modal, Button, InputGroup, FormControl} from 'react-bootstrap'
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker'
 import $ from 'jquery'
@@ -75,10 +75,10 @@ export default function TodoModal(props) {
      *  Not implemented
     */
     const deleteTodo = () => {
-        postServerWithDataAndAuth(DELETETODO, {
-        }).then(res => {
-            props.onHide(true) // true to update
-        })
+        // postServerWithDataAndAuth(DELETETODO, {
+        // }).then(res => {
+        //     props.onHide(true) // true to update
+        // })
     }
 
     /*  showToast(content:string)
@@ -132,7 +132,7 @@ export default function TodoModal(props) {
                     <InputGroup.Text className="todoModalText justify-content-center">Deadline</InputGroup.Text>
                 </InputGroup.Prepend>
                     <DatePicker className="datePicker todoModalText" selected={todoDeadline} onChange={date => setTodoDeadline(date)}
-                                dateFormat="MM-dd-yyyy hh:mm aa" showTimeInput timeInputLabel="Time:" showYearDropdown/>
+                                dateFormat="EEE, MMM dd, yyyy  hh:mm a" showTimeInput timeInputLabel="Time:" showYearDropdown/>
                 
                 <InputGroup.Append>
                     <Button variant="outline-secondary" onClick={()=>setTodoDeadline(new Date())}>Today</Button>

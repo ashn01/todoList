@@ -33,11 +33,17 @@ hr
     background-color: #ffffff;
     width: 52px;
     padding-right: 0;
+    border-right: none;
 }
 
 .todosTextField
 {
     height: 50px;
+}
+
+.todosTextField::placeholder
+{
+    opacity: 0.6;
 }
 
 .todoTextArea

@@ -13,16 +13,12 @@ export default class Main extends React.PureComponent
         {
             case 'home' : 
             return <Home/> 
-            break;
             case 'login' : 
             return <Login/>
-            break;
             case 'register' : 
             return <Register/>
-            break;
             default : 
             return null
-            break;
         }
     }
 

@@ -1,16 +1,45 @@
-.todoInput.form-control[readonly]
+.todoInputWrapper
 {
-    background-color: #ffffff;
-    border-left: none;
+    flex: 1 1 0;
+    cursor: pointer;
 }
 
-.todoInput.form-control[readonly].delayed
+.todosTitle
+{
+    border-top: 1px solid rgba(0,0,0,.125);
+    text-align: left;
+    background-color: #ffffff;
+    border-left: none;
+    border-bottom: none;
+    padding: 8px .75rem 0 .75rem;
+    font-size: 17px;
+    height: 36px;
+}
+
+.todosTitle.delayed
 {
     background-color: #ffeaea;
     border-left: none;
 }
 
 .todoInput.delayed
+{
+    background-color: #ffeaea;
+}
+
+.todosDate
+{
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    text-align: left;
+    font-size: 12px;
+    padding: 0 .75rem 10px .75rem;
+    color:#007bff;
+}
+
+.todosDate.delayed
 {
     background-color: #ffeaea;
 }
