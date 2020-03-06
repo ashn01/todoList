@@ -13,18 +13,17 @@
     border-bottom: none;
     padding: 8px .75rem 0 .75rem;
     font-size: 17px;
-    height: 36px;
 }
 
 .todosTitle.delayed
 {
-    background-color: #ffeaea;
+    background-color: #ffeaeaa8;
     border-left: none;
 }
 
 .todoInput.delayed
 {
-    background-color: #ffeaea;
+    background-color: #ffeaeaa8;
 }
 
 .todosDate
@@ -41,7 +40,8 @@
 
 .todosDate.delayed
 {
-    background-color: #ffeaea;
+    background-color: #ffeaeaa8;
+    color:#dc3545;
 }
 
 .completedTodo

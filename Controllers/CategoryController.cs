@@ -35,7 +35,7 @@ namespace TodoListWeb.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-            if (_userService.Validate(token))
+            if (_userService.Validate(token) != null)
             {
                 try
                 {
@@ -62,7 +62,7 @@ namespace TodoListWeb.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-            if (_userService.Validate(token))
+            if (_userService.Validate(token) != null)
             {
                 var category = _mapper.Map<NewCategory>(model);
 
@@ -94,7 +94,7 @@ namespace TodoListWeb.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-            if (_userService.Validate(token))
+            if (_userService.Validate(token) != null)
             {
                 NewCategory ret = _newCategoryRepository.GetCategory(model.Id);
                 if (ret != null)
@@ -131,7 +131,7 @@ namespace TodoListWeb.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-            if (_userService.Validate(token))
+            if (_userService.Validate(token) != null)
             {
                 try
                 {

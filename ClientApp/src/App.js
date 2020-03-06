@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect, Switch } from "react-router-dom";
 
 import Main from './components/Main'
 
@@ -10,12 +10,12 @@ export default class App extends Component {
   render () {
     return (
       <Router>
-        <div>
-          <Route exact path="/home" render={(props)=> <Main contents="home"/>} />
-          <Route path="/login" render={(props)=> <Main contents="login"/>} />
-          <Route path="/register" render={(props)=> <Main contents="register"/>} />
-          <Route render={(props) => <Main contents="login"/>} />
-        </div>
+        <Switch>
+            <Route exact path="/home" render={(props)=> <Main contents="home"/>} />
+            <Route path="/login" render={(props)=> <Main contents="login"/>} />
+            <Route path="/register" render={(props)=> <Main contents="register"/>} />
+            <Redirect to='/login'/>
+          </Switch>
       </Router>
     );
   }

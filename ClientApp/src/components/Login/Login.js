@@ -1,114 +1,132 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom';
-import { connect } from "react-redux";
-import {Spinner} from 'react-bootstrap'
+import { useDispatch } from "react-redux";
+import { toast } from 'react-toastify';
+import {Form,Row,Col,Button, Jumbotron} from 'react-bootstrap'
+import { showSpinner } from "../../Stores/Reducers/spinner";
 
 import { setInfo } from "../../Stores/Reducers/userInfo";
 
 import authenticationService from '../../services/Authentication'
 
 import '../../css/Login.css'
+import { setIn } from 'formik';
 
-class Login extends React.PureComponent
+
+export default function Login() 
 {
-    constructor(props)
-    {
-        super(props)
-        this.state =
-        {
-            email:"",
-            password:"",
-            toLogin : false,
-            toRegister : false,
-            isLoaded : true
-        }
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [toHome, setToHome] = useState(false)
+    const [toRegister, setToRegister] = useState(false)
+    const [validated, setValidated] = useState(false)
 
-    }
+    const dispatch = useDispatch()
+
+    React.useEffect(() => {
+        // after component mounted, it checks if token is valid then redirect to home
+        authenticationService.validate().
+        then(res => {
+            setToHome(true)
+        }).catch(err => {
+            //console.log(err)
+        })
+        dispatch(showSpinner(false))
+    }, [])
 
     /*  handleSubmit(e:element)
      *  send user email and password to server
      *  if successful, redirect to home
-    */
-    handleSubmit = (e) =>
-    {
+     */
+    const handleSubmit = (e) => {
         e.preventDefault();
-        this.setState({isLoaded : false})
-        authenticationService.login(this.state.email,this.state.password).then(res=>{
-            this.props.setInfo(res.id, res.email, res.firstName, res.lastName)
-            this.setState({toLogin:true})
-        }).catch(err=>{
-            this.setState({isLoaded : true})
-        })
+
+        dispatch(showSpinner(true))
+        authenticationService.login(email, password)
+            .then(res => {
+                dispatch(showSpinner(false))
+                dispatch(setInfo(res.id, res.email, res.firstName, res.lastName))
+                setToHome(true)
+            }).catch(err => {
+                showToast('Failed to Login')
+                dispatch(showSpinner(true))
+            })
+        setValidated(true)
     }
 
     /*  handleRegister()
      *  redirect to register page
-    */
-    handleRegister = () =>
-    {
-        this.setState({toRegister:true})
+     */
+    const handleRegister = () => {
+        setToRegister(true)
     }
 
-    /*  handleChange(e:element)
-     *  Change state with element value
-    */
-    handleChange = (e) =>
-    {
-        this.setState({
-            [e.target.id]:e.target.value
+    /*
+     * showToast(content:string)
+     * showing toast with string
+     */
+    const showToast = (content) => {
+        toast(content, {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            newestOnTop: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true
         })
     }
 
-    componentDidMount()
+   if(toRegister === true)
     {
-        // after component mounted, it checks if token is valid then redirect to home
-        authenticationService.validate().then(res=>{
-            this.setState({toLogin:true})
-        }).catch(err=>{
-            //console.log(err)
-        })
+        return <Redirect to='/register'/>
     }
+    if(toHome === true)
+    {
+        return <Redirect to='/home'/>
+    }
+    return (
+        <div className="main">
+            <Jumbotron>
+                <h3>Doobi-Do!</h3>
+            </Jumbotron>
+            <Form noValidate onSubmit={(e)=>handleSubmit(e)}>
+                <Form.Group controlId="email">
+                    <Form.Label>
+                        Email
+                    </Form.Label>
+                    <Form.Control type="email" placeholder="Email" required 
+                        pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+                        onChange={e=>setEmail(e.target.value)} value={email} 
+                        isValid={(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/).test(email)}
+                        isInvalid={!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/).test(email) && validated}/>
+                    <Form.Control.Feedback type="invalid">
+                        Email is not valid
+                    </Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group controlId="password">
+                    <Form.Label>
+                        Password
+                    </Form.Label>
+                    <Form.Control type="password" placeholder="Password" required
+                        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                        onChange={e=>setPassword(e.target.value)} 
+                        isValid={(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/).test(password)}
+                        isInvalid={!(/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/).test(password) && validated}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                        Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters
+                    </Form.Control.Feedback>
+                </Form.Group>
+                <br/>
+                <Form.Group as={Row} controlId="login">
+                        <Button type="submit" block>Login</Button>
+                </Form.Group>
+                <Form.Group as={Row} controlId="register">
+                    <Button variant="outline-secondary" type="button" onClick={()=>handleRegister()} className="float-right" block>Register</Button>
+                </Form.Group>
+            </Form>
+        </div>
+    )
 
-    render()
-    {
-        if(this.state.toRegister === true)
-        {
-            return <Redirect to='/register'/>
-        }
-        if(this.state.toLogin === true)
-        {
-            return <Redirect to='/home'/>
-        }
-        return (
-            <div className="main">
-                <div className="login">
-                    <div className="jumbotron">
-                        <h3>Doobi-Do!</h3>
-                    </div>
-                    <form onSubmit={this.handleSubmit}>
-                        <div className="form-group">
-                            <input autoFocus type="email" className="form-control" placeholder="Email address"
-                            id="email" onChange={e=>this.handleChange(e)}/>
-                        </div>
-                        <div className="form-group">
-                            <input type="password" className="form-control " placeholder="Password"
-                            id="password" onChange={e=>this.handleChange(e)}/>
-                        </div>
-                        <button type="submit" className="btn btn-primary btn-block">Login</button>
-                        <button type="button" className="btn btn-primary btn-block" onClick={this.handleRegister}>Register</button>
-                    </form>
-                </div>
-                <div className={`hideBack ${this.state.isLoaded ? "" : "active"}`}>
-                    <div className="spinnerContainer">
-                        <Spinner animation="border" variant="primary" />    
-                    </div>
-                </div>
-            </div>
-        )
-    }
 }
-
-export default connect(
-    null,
-    {setInfo}
-)(Login)

@@ -17,8 +17,11 @@ namespace TodoListWeb.Services
     public interface IUserService
     {
         User Authenticate(string username, string password);
-        public bool Validate(string token);
+        string getUserId(string username);
+        public ClaimsPrincipal Validate(string token);
         User Create(User user, string password);
+        User ConfirmEmail(string userId);
+        bool CheckConfirmed(string username);
         IEnumerable<User> GetAll();
     }
     public class UserService : IUserService
@@ -50,26 +53,58 @@ namespace TodoListWeb.Services
             return user;
         }
 
-        public bool Validate(string token)
+        public string getUserId(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+                return null;
+
+            var user = _context.Users.SingleOrDefault(x => x.Email == username);
+
+            if (user == null)
+                return null;
+
+            return user.Id;
+        }
+
+        public ClaimsPrincipal Validate(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
             try
             {
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                var validations = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key)
-                }, out SecurityToken validatedToken);
-                return true;
+                };
+
+                return tokenHandler.ValidateToken(token,validations, out var tokenSecure);
             }
             catch
             {
-                return false;
+                return null;
             }
+            //var tokenHandler = new JwtSecurityTokenHandler();
+            //var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+
+            //try
+            //{
+            //    tokenHandler.ValidateToken(token, new TokenValidationParameters
+            //    {
+            //        ValidateIssuer = false,
+            //        ValidateAudience = false,
+            //        ValidateIssuerSigningKey = true,
+            //        IssuerSigningKey = new SymmetricSecurityKey(key)
+            //    }, out SecurityToken validatedToken);
+            //    return true;
+            //}
+            //catch
+            //{
+            //    return false;
+            //}
         }
 
         public IEnumerable<User> GetAll()
@@ -96,6 +131,41 @@ namespace TodoListWeb.Services
             _context.SaveChanges();
 
             return user;
+        }
+
+        public User ConfirmEmail(string userId)
+        {
+            // validation
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new Exception("Wrong User ID");
+
+            if (!_context.Users.Any(x => x.Id == userId))
+                throw new Exception("User Not Found");
+
+            var user = _context.Users.SingleOrDefault(x => x.Id == userId);
+            user.EmailConfirmed = true;
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
+
+            return user;
+        }
+
+        public bool CheckConfirmed(string username)
+        {
+            // validation
+            if (string.IsNullOrWhiteSpace(username))
+                throw new Exception("Wrong User ID");
+
+            if (!_context.Users.Any(x => x.Email == username))
+                throw new Exception("User Not Found");
+
+            var user = _context.Users.SingleOrDefault(x => x.Email == username);
+
+            if (user.EmailConfirmed)
+                return true;
+            else
+                return false;
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

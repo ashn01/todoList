@@ -1,19 +1,19 @@
 import axios from 'axios'
 import authenticationService from './services/Authentication';
 
-export const LOGIN = `https://todolistweb.azurewebsites.net/account/authenticate`
-export const REGISTER = `https://todolistweb.azurewebsites.net/account/register`
-export const VERIFYTOKEN = `https://todolistweb.azurewebsites.net/account/validate`
+export const LOGIN = `${process.env.REACT_APP_API_URL}/account/authenticate`
+export const REGISTER = `${process.env.REACT_APP_API_URL}/account/register`
+export const VERIFYTOKEN = `${process.env.REACT_APP_API_URL}/account/validate`
 
-export const ADDCATEGORY = `https://todolistweb.azurewebsites.net/api/category/add`
-export const GETCATEGORY = `https://todolistweb.azurewebsites.net/api/category/getById`
-export const MODIFYCATEGORY = `https://todolistweb.azurewebsites.net/api/category/editById`
-export const DELETECATEGORY = `https://todolistweb.azurewebsites.net/api/category/deleteById`
+export const ADDCATEGORY = `${process.env.REACT_APP_API_URL}/api/category/add`
+export const GETCATEGORY = `${process.env.REACT_APP_API_URL}/api/category/getById`
+export const MODIFYCATEGORY = `${process.env.REACT_APP_API_URL}/api/category/editById`
+export const DELETECATEGORY = `${process.env.REACT_APP_API_URL}/api/category/deleteById`
 
-export const ADDTODO = `https://todolistweb.azurewebsites.net/api/todo/add`
-export const GETTODO = `https://todolistweb.azurewebsites.net/api/todo/getById`
-export const MODIFYTODO = `https://todolistweb.azurewebsites.net/api/todo/editById`
-export const DELETETODO = `https://todolistweb.azurewebsites.net/api/todo/deleteById`
+export const ADDTODO = `${process.env.REACT_APP_API_URL}/api/todo/add`
+export const GETTODO = `${process.env.REACT_APP_API_URL}/api/todo/getById`
+export const MODIFYTODO = `${process.env.REACT_APP_API_URL}/api/todo/editById`
+export const DELETETODO = `${process.env.REACT_APP_API_URL}/api/todo/deleteById`
 
 
 function getToken()

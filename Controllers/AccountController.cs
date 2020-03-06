@@ -24,16 +24,19 @@ namespace TodoListWeb.Controllers
     public class AccountController : ControllerBase
     {
         private IUserService _userService;
+        private IEmailSender _emailSender;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
 
         public AccountController(IUserService userService,
                                  IMapper mapper,
-                                 IOptions<AppSettings> appSettings)
+                                 IOptions<AppSettings> appSettings,
+                                 IEmailSender emailSender)
         {
             _userService = userService;
             _appSettings = appSettings.Value;
             _mapper = mapper;
+            _emailSender = emailSender;
         }
 
         [AllowAnonymous]
@@ -44,6 +47,10 @@ namespace TodoListWeb.Controllers
 
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
+
+            // check if user confirmed email
+            if(!_userService.CheckConfirmed(user.Email))
+                return Unauthorized(new { message = "User need to confirm email address" });
 
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -76,7 +83,7 @@ namespace TodoListWeb.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-            if (_userService.Validate(token))
+            if (_userService.Validate(token)!= null)
                 return Ok();
             else
                 return Unauthorized(new { message = "Invalid Token" });
@@ -93,6 +100,28 @@ namespace TodoListWeb.Controllers
             {
                 // create user
                 _userService.Create(user, model.Password);
+                var userId = _userService.getUserId(model.Email);
+
+                // create token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Name, userId.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(10),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                var code = tokenString;
+                var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userId, code = code }, protocol: HttpContext.Request.Scheme);
+                var html = "Confirm your account Please confirm your account by clicking this link: <a href='"+callbackUrl+"'>link</a>";
+                _emailSender.SendEmailAsync(user.Email, "Welcome to Doobi-Do! Confirm Your Email", "Welcome", html);
+                
                 return Ok();
             }
             catch (Exception ex)
@@ -101,6 +130,25 @@ namespace TodoListWeb.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [AllowAnonymous]
+        [HttpGet("ConfirmEmail")]
+        public IActionResult ConfirmEmail([FromQuery(Name = "userId")] string id, [FromQuery(Name = "code")] string token)
+        {
+            var tokenClaims = _userService.Validate(token);
+            if(tokenClaims == null)
+                return Unauthorized(new { message = "Invalid Token" });
+
+            var userId = tokenClaims.Identity.Name;
+            if(id.Contains(userId))
+            {
+                _userService.ConfirmEmail(id);
+                return Ok();
+            }
+            else
+                return Unauthorized(new { message = "Invalid Token" });
+        }
+
 
         [HttpGet]
         public IActionResult GetAll()

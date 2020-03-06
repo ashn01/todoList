@@ -3,8 +3,9 @@ import {Modal, Button, InputGroup, FormControl} from 'react-bootstrap'
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker'
 import $ from 'jquery'
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
+import { showSpinner } from "../../Stores/Reducers/spinner";
 import {postServerWithDataAndAuth, MODIFYTODO, DELETETODO} from '../../APIROUTE'
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -29,7 +30,7 @@ export default function TodoModal(props) {
     const [todoCategoryId, setCategoryId] = useState(props.todo !== undefined ? 
                                                         props.todo.newCategoryId 
                                                     :   "");  
-    const store = useSelector(state => state); // get redux store
+    
     const dispatch = useDispatch()
     
     $('.react-datepicker-wrapper').addClass('form-control'); // add class to datepicker                                    
@@ -57,6 +58,7 @@ export default function TodoModal(props) {
     const modifyTodo = () =>{
         if(todoName.length !== 0)
         {
+            dispatch(showSpinner(true))
             postServerWithDataAndAuth(MODIFYTODO, {
                 id:todoId,
                 todoname:todoName,
@@ -65,6 +67,7 @@ export default function TodoModal(props) {
                 TodoCompleted:todoCompleted,
                 newcategoryid:todoCategoryId
             }).then(res => {
+                dispatch(showSpinner(false))
                 showToast(props.todo.todoName + " Edited!")
                 props.onHide(res) // true to update
             })

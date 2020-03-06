@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link, Redirect } from 'react-router-dom';
-import $ from 'jquery'
 
 import {store, persistor} from '../../store'
 import { connect } from "react-redux";

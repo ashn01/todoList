@@ -15,6 +15,8 @@ using TodoListWeb.Data;
 using TodoListWeb.Helpers;
 using TodoListWeb.Services;
 using TodoListWeb.Data.Repositories;
+using Microsoft.Extensions.Options;
+using System.Configuration;
 
 namespace TodoListWeb
 {
@@ -82,6 +84,8 @@ namespace TodoListWeb
             services.AddScoped<ITodoRepository, TodoRepository>();
             services.AddScoped<INewCategoryRepository, NewCategoryRepository>();
             services.AddScoped<INewTodoRepository, NewTodoRepository>();
+            services.AddTransient<IEmailSender, EmailSender>(); // email
+            services.Configure<AuthMessageSenderOptions>(_configuration);
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

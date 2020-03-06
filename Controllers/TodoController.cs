@@ -35,7 +35,7 @@ namespace TodoListWeb.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-            if (_userService.Validate(token))
+            if (_userService.Validate(token) != null)
             {
                 var todo = _mapper.Map<NewTodo>(model);
 
@@ -66,7 +66,7 @@ namespace TodoListWeb.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-            if (_userService.Validate(token))
+            if (_userService.Validate(token) != null)
             {
                 NewTodo ret = _newTodoRepository.GetTodo(model.ID);
                 if (ret != null)
@@ -101,7 +101,7 @@ namespace TodoListWeb.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-            if (_userService.Validate(token))
+            if (_userService.Validate(token) != null)
             {
                 try
                 {
@@ -127,7 +127,7 @@ namespace TodoListWeb.Controllers
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-            if (_userService.Validate(token))
+            if (_userService.Validate(token) != null)
             {
                 try
                 {
