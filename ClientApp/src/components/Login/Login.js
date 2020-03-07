@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { toast } from 'react-toastify';
-import {Form,Row,Col,Button, Jumbotron} from 'react-bootstrap'
+import {Form,Row,Button, Jumbotron} from 'react-bootstrap'
 import { showSpinner } from "../../Stores/Reducers/spinner";
 
 import { setInfo } from "../../Stores/Reducers/userInfo";
@@ -10,7 +10,6 @@ import { setInfo } from "../../Stores/Reducers/userInfo";
 import authenticationService from '../../services/Authentication'
 
 import '../../css/Login.css'
-import { setIn } from 'formik';
 
 
 export default function Login() 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom';
-import {Form,Row,Col,Button, Jumbotron} from 'react-bootstrap'
+import {Form,Button, Jumbotron} from 'react-bootstrap'
+import { toast } from 'react-toastify';
 
 import { showSpinner } from "../../Stores/Reducers/spinner";
 import {postServerWithData , REGISTER} from '../../APIROUTE'
@@ -31,9 +32,12 @@ export default function Register() {
                 firstname: firstname,
                 lastname: lastname
             }).then(res => {
+                showToast("Confirm email sent to "+email)
                 dispatch(showSpinner(false))
                 handleLogin()
             }).catch(err => {
+                showToast("Error to register",'error')
+                dispatch(showSpinner(false))
                 console.log(err)
             })
         }
@@ -54,6 +58,25 @@ export default function Register() {
      */
     const handleLogin = () => {
         setToLogin(true)
+    }
+
+    /*
+     * showToast(content:string, type:string)
+     * showing toast with string
+    */
+   const showToast = (content, type) =>{
+        switch(type)
+        {
+            case 'error' :
+                toast.error(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+            break;
+            default :
+                toast(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+        }
     }
 
     if(toLogin === true)

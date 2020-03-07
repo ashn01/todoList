@@ -14,6 +14,7 @@ export default class App extends Component {
             <Route exact path="/home" render={(props)=> <Main contents="home"/>} />
             <Route path="/login" render={(props)=> <Main contents="login"/>} />
             <Route path="/register" render={(props)=> <Main contents="register"/>} />
+            <Route path="/account/verifyUser" render={(props)=> <Main contents="verification"/>}/>
             <Redirect to='/login'/>
           </Switch>
       </Router>

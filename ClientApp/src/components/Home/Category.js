@@ -24,27 +24,30 @@ export default function Category() {
     const dispatch = useDispatch()
 
     useEffect(()=>{
-        /*  getCategoryFromServer()
-        *  set Loading until it is fully loaded and shows loading page
-        *  send user info to the server and get categories and todos data
-        *  after getting data, update its state with corresponding data
-        */
-        const getCategoryFromServer = () => {
-            dispatch(isLoading(false))
-            dispatch(showSpinner(true))
-            postServerWithDataAndAuth(GETCATEGORY, {
-                id: info.id
-            }).then(res => {
-                updateCategories(res);
-            })
-        }
-
         getCategoryFromServer()
         // will unmount
         return ()=>{
             
         }
     }, [])   
+
+    /*  getCategoryFromServer()
+        *  set Loading until it is fully loaded and shows loading page
+        *  send user info to the server and get categories and todos data
+        *  after getting data, update its state with corresponding data
+        */
+       const getCategoryFromServer = () => {
+        dispatch(isLoading(false))
+        dispatch(showSpinner(true))
+        postServerWithDataAndAuth(GETCATEGORY, {
+            id: info.id
+        }).then(res => {
+            updateCategories(res);
+        }).catch(err=>{
+            console.log(err)
+            dispatch(showSpinner(false))
+        })
+    }
 
    /*  updateCategories(data:{})
     *  set data to store and set loading finished
@@ -118,10 +121,10 @@ export default function Category() {
                    selectedCategoryIndex : selectedCategoryIndex - 1
                forceSelect(index)
                dispatch(setSelectedCategory(category[index].id, index))
-
            }
        }
    }
+   
    return(
     <div className="card text-center">
         <div className="card-header">
@@ -133,7 +136,7 @@ export default function Category() {
                     category.map((v,i)=>{
                         return (
                             <li className={`nav-item categoryPanel`} key={i} >
-                                <div className={`category nav-link ${selectedCategoryIndex == i ? "active" : ""}`}
+                                <div className={`category nav-link ${selectedCategoryIndex === parseInt(i) ? "active" : ""}`}
                                 onClick={(e)=>selectCategory(e)}
                                 onDoubleClick={(e)=>showModal(true,e,false,undefined)} id={i}>
                                     {v.categoryName} 

@@ -29,7 +29,7 @@ export default function CategoryModal(props) {
             setCategoryId(-1);
         }
         setShowAlert(false)
-    }, [props.category])
+    }, [props.category, props.show])
     
     /*
      * modifyCategory()
@@ -143,7 +143,7 @@ export default function CategoryModal(props) {
                 :
                     <Button variant="primary" onClick={()=>addCategory()}>Add</Button>
             }
-            <Button variant="outline-primary" onClick={()=>props.onHide(undefined, false)}>Close</Button>
+            <Button variant="outline-primary" onClick={()=>{props.onHide(undefined, false); setShowAlert(false)}}>Close</Button>
         </Modal.Footer>
         
         <Alert show={showAlert} variant="danger">

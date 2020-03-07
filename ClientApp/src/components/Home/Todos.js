@@ -1,108 +1,77 @@
-import React from 'react'
+import React, { useState } from 'react'
 import TodoModal from './TodoModal'
 import { toast } from 'react-toastify';
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import {postServerWithDataAndAuth , ADDTODO, GETTODO, DELETETODO, MODIFYTODO } from '../../APIROUTE'
-import {store} from '../../store'
+import {postServerWithDataAndAuth , ADDTODO, DELETETODO, MODIFYTODO } from '../../APIROUTE'
 import { setTodos} from "../../Stores/Reducers/categories";
+import { showSpinner } from "../../Stores/Reducers/spinner";
 
 import '../../css/Todo.css'
 
-class Todos extends React.PureComponent
+export default function Todos()
 {
-    constructor(props) {
-        super(props);
-        this.state = {
-            todoTitle:"",
-            modalShow : false,
-            selectedTodo:0,
-            showTodos : store.getState().headerPanel.index,
-            selectedCategoryIndex : store.getState().categoryReducer.selectedCategoryIndex,
-            selectedCategoryId : store.getState().categoryReducer.selectedCategoryId,
-            todos : []
-        }
-        this._isMounted = false;
-        this.unsubscribe = store.subscribe(()=>{
-            this.setDataFromStore();
-        })
-    }
+    const selectedCategoryindex = useSelector(state=>state.categoryReducer.selectedCategoryIndex)
+    const selectedCategoryId = useSelector(state=>state.categoryReducer.selectedCategoryId)
+    const todos = useSelector(state=>state.categoryReducer.categories[selectedCategoryindex].todos)
+    const showTodos = useSelector(state=>state.headerPanel.index)
 
-    /*  setDataFromStore()
-     *  get Data from store and set it to its state
-     *  it checks if this component is mounted, otherwise will not set data
-    */
-    setDataFromStore()
-    {
-        const selectedCategoryIndex = store.getState().categoryReducer.selectedCategoryIndex
-        const data = store.getState().categoryReducer.categories[selectedCategoryIndex] ? 
-                store.getState().categoryReducer.categories[selectedCategoryIndex].todos : []
+    const [modalShow, setModalShow] = useState(false)
+    const [selectedTodo, setSelectedTodo] = useState(0)
+    const [todoTitle, setTodoTitle] = useState('')
+
+    const dispatch = useDispatch()
+    React.useEffect(()=>{
         
-        if(this._isMounted)
-        {
-            this.setState({
-                todos:data ,
-                showTodos:store.getState().headerPanel.index,
-                selectedCategoryIndex: selectedCategoryIndex,
-                selectedCategoryId:store.getState().categoryReducer.selectedCategoryId
-            })
-        }
-    }
+    },[])
 
-    componentDidMount()
-    {
-        this._isMounted = true;
-        this.setDataFromStore()
-    }
-
-    componentWillUnmount()
-    {
-        this._isMounted = false;
-        this.unsubscribe()
-    }
-
-    
     /*  addTodo=()
      *  if todo name is not empty, send todo name, and current date, and categoryId to the server
      *  after update db, it updates store with new data and shows toast.
      *  also reset todo text input box
     */
-    addTodo=()=>{
-        if(this.state.todoTitle.length !== 0)
+    const addTodo=()=>{
+        if(todoTitle.length !== 0)
         {
+            dispatch(showSpinner(true))
             postServerWithDataAndAuth(ADDTODO,{
-                todoname:this.state.todoTitle, 
+                todoname:todoTitle, 
                 tododeadline:new Date(),
                 todocompleted:false, 
-                newcategoryid:this.state.selectedCategoryId
+                newcategoryid:selectedCategoryId
             }).then(res=>{
-                this.props.setTodos(res.data.todos)
-                this.showToast(this.state.todoTitle + " Added!")
-                this.setState({todoTitle:""})
+                dispatch(showSpinner(false))
+                dispatch(setTodos(res.data.todos))
+                showToast(todoTitle + " Added!")
+                setTodoTitle('')
             }).catch(err=>{
+                dispatch(showSpinner(false))
                 console.log(err)
             })
         }
         else
         {
-            this.showToast("Empty todo cannot be added!")
+            showToast("Empty todo cannot be added!")
         }
     }
-
+    
     /*  deleteTodo(index:number)
      *  send corresponding todo ID, name, and its categoryId
      *  shows toast first
      *  then, update store with data
     */
-    deleteTodo = (index) =>{
+    const deleteTodo = (index) =>{
+        dispatch(showSpinner(true))
         postServerWithDataAndAuth(DELETETODO,{
-            id : this.state.todos[index].id, 
-            todoname:this.state.todos[index].todoName,
-            newcategoryid:this.state.selectedCategoryId
+            id : todos[index].id, 
+            todoname:todos[index].todoName,
+            newcategoryid:selectedCategoryId
         }).then(res=>{
-            this.showToast(this.state.todos[index].todoName + " Deleted!")
-            this.props.setTodos(res.data.todos)
+            dispatch(showSpinner(false))
+            showToast(todos[index].todoName + " Deleted!")
+            dispatch(setTodos(res.data.todos))
         }).catch(err=>{
+            dispatch(showSpinner(false))
             console.log(err)
         })
     }
@@ -112,18 +81,23 @@ class Todos extends React.PureComponent
      *  shows toast first
      *  then, update store with data 
     */
-    completeTodo = (index) =>{
+    const completeTodo = (index) =>{
+        dispatch(showSpinner(true))
         postServerWithDataAndAuth(MODIFYTODO, {
-            id:this.state.todos[index].id,
-            todoname:this.state.todos[index].todoName,
-            todoDescription:this.state.todos[index].todoDescription,
-            tododeadline:this.state.todos[index].todoDeadline,
-            TodoCompleted:!this.state.todos[index].todoCompleted,
-            newcategoryid:this.state.selectedCategoryId
+            id:todos[index].id,
+            todoname:todos[index].todoName,
+            todoDescription:todos[index].todoDescription,
+            tododeadline:todos[index].todoDeadline,
+            TodoCompleted:!todos[index].todoCompleted,
+            newcategoryid:selectedCategoryId
         }).then(res => {
-            var content = this.state.todos[index].todoName + (!this.state.todos[index].todoCompleted ? " Not Completed!" : " Completed!")
-            this.props.setTodos(res.data.todos)
-            this.showToast(content)
+            dispatch(showSpinner(false))
+            var content = todos[index].todoName + (todos[index].todoCompleted ? " Not Completed!" : " Completed!")
+            dispatch(setTodos(res.data.todos))
+            showToast(content)
+        }).catch(err=>{
+            console.log(err)
+            dispatch(showSpinner(false))
         })
     }
 
@@ -131,41 +105,27 @@ class Todos extends React.PureComponent
      *  depends on show, modal displayed with selected todo data
      *  if data is not undefined which means update needed, update store
     */
-    setModalShow = (show,selected,data) => {
+    const showModal = (show,selected,data) => {
         if(show)
         { // show modal
-            this.setState({
-                modalShow : show, 
-                selectedTodo: selected
-            })
+            setModalShow(show)
+            setSelectedTodo(selected)
         }
         else
         { // close modal
-            this.setState({
-                modalShow : show
-            })
+            setModalShow(show)
         }
         // update state from server
         if(data !== undefined)
         {
-            this.props.setTodos(data.data.todos)
+            dispatch(setTodos(data.data.todos))
         }
-    }
-
-    /*  handleChange(e:element)
-     *  change state with corresponding data when element onChange fired
-    */
-    handleChange = (e) =>
-    {
-        this.setState({
-            [e.target.id]:e.target.value
-        })
     }
 
     /*  showToast(content:string)
      *  display toast with string
     */
-    showToast = (content) =>{
+    const showToast = (content) =>{
         toast(content,{position:"top-right", 
                             autoClose: 3000, hideProgressBar:true, newestOnTop:true,
                             closeOnClick: true, pauseOnHover: true, draggable: true})
@@ -174,7 +134,7 @@ class Todos extends React.PureComponent
     /*  showToast(date:Date)
      *  formating date to 'DDD, MMM dd, yyyy hh:mm aa'
     */
-    dateFormat = (date) =>{
+    const dateFormat = (date) =>{
         var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -190,78 +150,72 @@ class Todos extends React.PureComponent
         var ampm = d.getHours() >= 12 ? 'pm' : 'am'
         return doW+", "+mon+" "+day+", "+year+"  "+hour+":"+min+" "+ampm
     }
-    render()
-    {
-        return(
-            <div className="card-body">
-                <ul className="list-group">
-                    <div className="input-group" >
-                        <input type="text" className="form-control todosTextField" placeholder="Enter a new Todo" id="todoTitle"
-                                value={this.state.todoTitle} onChange={(e)=>this.handleChange(e)}/>
-                        <div className="input-group-append" id="addTodo">
-                            <button className="btn todoAddBtn" type="button"
-                                    onClick={()=>this.addTodo()}>
-                                <div className="addImg"></div>
-                            </button>
-                        </div>
+
+    return(
+        <div className="card-body">
+            <ul className="list-group">
+                <div className="input-group" >
+                    <input type="text" className="form-control todosTextField" placeholder="Enter a new Todo" id="todoTitle"
+                            value={todoTitle} onChange={(e)=>setTodoTitle(e.target.value)}/>
+                    <div className="input-group-append" id="addTodo">
+                        <button className="btn todoAddBtn" type="button"
+                                onClick={()=>addTodo()}>
+                            <div className="addImg"></div>
+                        </button>
                     </div>
-                </ul>
-                <hr/>
-                <ul className="list-group">
-                    {
-                        // todos shouldn't be undefined
-                        this.state.todos &&
-                        this.state.todos.map((v,i)=>{
-                            if((this.state.showTodos === 0 && !v.todoCompleted) || (this.state.showTodos === 1 && v.todoCompleted)) // not completed
-                            {
-                                const delay = new Date(v.todoDeadline) < new Date().setHours(0,0,0,0) && !v.todoCompleted ? "delayed" : ""
-                                return (
-                                <div className="input-group" key={i}>
-                                    <div className="input-group-prepend">
-                                        <div className={`todoInput input-group-text checkboxWrapper ${delay}`}>
-                                            <div id={i} className={`checkboxImg ${v.todoCompleted ? "checked" :""}`} onClick={(e)=>this.completeTodo(e.target.id)}></div>
-                                        </div>
-                                    </div>
-                                    <div className="todoInputWrapper">
-                                        <div id={i} onDoubleClick={(e)=>this.setModalShow(true,e.target.id)} className={`todosTitle ${delay} ${v.todoCompleted ? " completedTodo":""}`}>
-                                            {v.todoName}
-                                        </div>
-                                        <div id={i} className={"todosDate "+delay} onDoubleClick={(e)=>this.setModalShow(true,e.target.id)}>
-                                            {this.dateFormat(v.todoDeadline)}
-                                        </div>
-                                    </div>
-                                    <div className="input-group-append" id="button-addon4">
-                                        <button id={i} className="btn todoEditBtn" type="button"
-                                            onClick={(e)=>{this.setModalShow(true,e.target.id); }}>
-                                                <div id={i} className="editImg"></div>
-                                        </button>
-                                        <button id={i} className="btn todoDeleteBtn" type="button"
-                                            onClick={(e)=>this.deleteTodo(e.target.id)}>
-                                                <div id={i} className="deleteImg"></div>
-                                        </button>
+                </div>
+            </ul>
+            <hr/>
+            <ul className="list-group">
+                {
+                    // todos shouldn't be undefined
+                    todos &&
+                    todos.map((v,i)=>{
+                        if((showTodos === 0 && !v.todoCompleted) || (showTodos === 1 && v.todoCompleted)) // not completed
+                        {
+                            const delay = new Date(v.todoDeadline) < new Date().setHours(0,0,0,0) && !v.todoCompleted ? "delayed" : ""
+                            return (
+                            <div className="input-group" key={i}>
+                                <div className="input-group-prepend">
+                                    <div className={`todoInput input-group-text checkboxWrapper ${delay}`}>
+                                        <div id={i} className={`checkboxImg ${v.todoCompleted ? "checked" :""}`} onClick={(e)=>completeTodo(e.target.id)}></div>
                                     </div>
                                 </div>
-                                )
-                            }
-                            else
-                                return null;
-                        })
-                    }
-                </ul>
-                {
-                        // todos shouldn't be undefined
-                    this.state.todos &&
-                    <TodoModal  show={this.state.modalShow} 
-                                onHide={(data)=>this.setModalShow(false,undefined,data)} 
-                                todo={this.state.todos[this.state.selectedTodo]}
-                                />
+                                <div className="todoInputWrapper">
+                                    <div id={i} onDoubleClick={(e)=>showModal(true,e.target.id)} className={`todosTitle ${delay} ${v.todoCompleted ? " completedTodo":""}`}>
+                                        {v.todoName}
+                                    </div>
+                                    <div id={i} className={"todosDate "+delay} onDoubleClick={(e)=>showModal(true,e.target.id)}>
+                                        {dateFormat(v.todoDeadline)}
+                                    </div>
+                                </div>
+                                <div className="input-group-append" id="button-addon4">
+                                    <button id={i} className="btn todoEditBtn" type="button"
+                                        onClick={(e)=>{showModal(true,e.target.id); }}>
+                                            <div id={i} className="editImg"></div>
+                                    </button>
+                                    <button id={i} className="btn todoDeleteBtn" type="button"
+                                        onClick={(e)=>deleteTodo(e.target.id)}>
+                                            <div id={i} className="deleteImg"></div>
+                                    </button>
+                                </div>
+                            </div>
+                            )
+                        }
+                        else
+                            return null;
+                    })
                 }
-            </div>
-        )
-    }
-}
+            </ul>
+            {
+                    // todos shouldn't be undefined
+                todos &&
+                <TodoModal  show={modalShow} 
+                            onHide={(data)=>showModal(false,undefined,data)} 
+                            todo={todos[selectedTodo]}
+                            />
+            }
+        </div>
+    )
 
-export default connect(
-    null,
-    {setTodos}
-)(Todos)
+}

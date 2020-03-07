@@ -6,6 +6,7 @@ import {Spinner} from 'react-bootstrap'
 import Home from './Home/Home'
 import Login  from './Login/Login';
 import Register  from './Login/Register';
+import Verification  from './Login/Verification';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/Common.css'
@@ -29,6 +30,8 @@ export default function Main (props)
             return <Login/>
             case 'register' : 
             return <Register/>
+            case 'verification' :
+            return <Verification/>
             default : 
             return null
         }
@@ -42,7 +45,7 @@ export default function Main (props)
             {
                 renderWhat()
             }
-            <div className={`hideBack ${showSpinner ?  "":""}`}>
+            <div className={`hideBack ${showSpinner ?  "active":""}`}>
                 <div className="spinnerContainer">
                     <Spinner animation="border" variant="primary" />    
                 </div>

@@ -70,6 +70,9 @@ export default function TodoModal(props) {
                 dispatch(showSpinner(false))
                 showToast(props.todo.todoName + " Edited!")
                 props.onHide(res) // true to update
+            }).catch(err=>{
+                console.log(err)
+                dispatch(showSpinner(false))
             })
         }else
         {

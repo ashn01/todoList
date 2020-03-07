@@ -118,7 +118,7 @@ namespace TodoListWeb.Controllers
                 var tokenString = tokenHandler.WriteToken(token);
 
                 var code = tokenString;
-                var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = userId, code = code }, protocol: HttpContext.Request.Scheme);
+                var callbackUrl = Url.Action("verifyUser", "account", new { userId = userId, code = code }, protocol: HttpContext.Request.Scheme);
                 var html = "Confirm your account Please confirm your account by clicking this link: <a href='"+callbackUrl+"'>link</a>";
                 _emailSender.SendEmailAsync(user.Email, "Welcome to Doobi-Do! Confirm Your Email", "Welcome", html);
                 
@@ -132,22 +132,55 @@ namespace TodoListWeb.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("confirmEmail")]
+        public IActionResult ConfirmEmail([FromBody] ConfirmEmailModel model)
+        {
+            try
+            {
+                var tokenClaims = _userService.Validate(model.token);
+                if (tokenClaims == null)
+                    return Unauthorized();
+
+                var userId = tokenClaims.Identity.Name;
+                if (model.id.Contains(userId))
+                {
+                    _userService.ConfirmEmail(model.id);
+                    return Ok();
+                }
+                else
+                    return Unauthorized(new { message = "Invalid access" });
+            }
+            catch(Exception e)
+            {
+                return BadRequest( new { e });
+            }
+        }
+        /*
+        [AllowAnonymous]
         [HttpGet("ConfirmEmail")]
         public IActionResult ConfirmEmail([FromQuery(Name = "userId")] string id, [FromQuery(Name = "code")] string token)
         {
-            var tokenClaims = _userService.Validate(token);
-            if(tokenClaims == null)
-                return Unauthorized(new { message = "Invalid Token" });
-
-            var userId = tokenClaims.Identity.Name;
-            if(id.Contains(userId))
+            try
             {
-                _userService.ConfirmEmail(id);
-                return Ok();
+                var tokenClaims = _userService.Validate(token);
+                if (tokenClaims == null)
+                    return Unauthorized();
+
+                var userId = tokenClaims.Identity.Name;
+                if (id.Contains(userId))
+                {
+                    _userService.ConfirmEmail(id);
+                    return Ok();
+                }
+                else
+                    return Unauthorized(new { message = "Invalid access" });
             }
-            else
-                return Unauthorized(new { message = "Invalid Token" });
+            catch(Exception e)
+            {
+                return BadRequest( new { e });
+            }
         }
+         */
 
 
         [HttpGet]

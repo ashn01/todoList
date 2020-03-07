@@ -4,6 +4,7 @@ import authenticationService from './services/Authentication';
 export const LOGIN = `${process.env.REACT_APP_API_URL}/account/authenticate`
 export const REGISTER = `${process.env.REACT_APP_API_URL}/account/register`
 export const VERIFYTOKEN = `${process.env.REACT_APP_API_URL}/account/validate`
+export const CONFIRMEMAIL = `${process.env.REACT_APP_API_URL}/account/confirmEmail`
 
 export const ADDCATEGORY = `${process.env.REACT_APP_API_URL}/api/category/add`
 export const GETCATEGORY = `${process.env.REACT_APP_API_URL}/api/category/getById`
@@ -32,7 +33,7 @@ export async function getServer(route) {
 
 export async function getServerWithParams(route, p)
 {
-    return await axios.get(route,{params:{id:p}})
+    return await axios.get(route,{p})
 }
 
 export async function postServer(route) {

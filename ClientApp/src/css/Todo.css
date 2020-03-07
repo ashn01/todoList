@@ -6,7 +6,7 @@
 
 .todosTitle
 {
-    border-top: 1px solid rgba(0,0,0,.125);
+    border-top: 1px solid #ced4da;
     text-align: left;
     background-color: #ffffff;
     border-left: none;
@@ -31,7 +31,7 @@
     border-top: none;
     border-left: none;
     border-right: none;
-    border-bottom: 1px solid rgba(0,0,0,.125);
+    border-bottom: 1px solid #ced4da;
     text-align: left;
     font-size: 12px;
     padding: 0 .75rem 10px .75rem;

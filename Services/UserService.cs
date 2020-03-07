@@ -130,6 +130,26 @@ namespace TodoListWeb.Services
             _context.Users.Add(user);
             _context.SaveChanges();
 
+            // Add default data
+            var newUser = _context.Users.SingleOrDefault(x => x.Email == user.Email);
+            _context.NewCategories.Add(new NewCategory { CategoryName = "My Category" , Owner=newUser.Id});
+            _context.SaveChanges();
+
+            var addedCategory = _context.NewCategories.SingleOrDefault(c => c.Owner == newUser.Id);
+            DateTimeOffset today = DateTimeOffset.Now;
+            List<NewTodo> todos = new List<NewTodo>()
+            {
+                new NewTodo () { TodoName="Welcome to Doo-bido",TodoCompleted=false, NewCategoryId=addedCategory.ID, TodoDeadline=today },
+                new NewTodo () { TodoName="You can add new category by clicking +",TodoCompleted=false, NewCategoryId=addedCategory.ID, TodoDeadline=today },
+                new NewTodo () { TodoName="You also can add new todos. Type todo title and Click +",TodoCompleted=false, NewCategoryId=addedCategory.ID, TodoDeadline=today },
+                new NewTodo () { TodoName="You can modify category name. Double click on it",TodoCompleted=false, NewCategoryId=addedCategory.ID, TodoDeadline=today },
+                new NewTodo () { TodoName="You can modify todos. Double click on it or edit button",TodoCompleted=false, NewCategoryId=addedCategory.ID, TodoDeadline=today },
+                new NewTodo () { TodoName="Delayed todo will be  noticeable",TodoCompleted=false, NewCategoryId=addedCategory.ID, TodoDeadline=today.AddDays(-1)}
+            };
+            _context.NewTodos.AddRange(todos);
+
+            _context.SaveChanges();
+
             return user;
         }
 
