@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import TodoModal from './TodoModal'
-import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from "react-redux";
 
 import {postServerWithDataAndAuth , ADDTODO, DELETETODO, MODIFYTODO } from '../../APIROUTE'
 import { setTodos} from "../../Stores/Reducers/categories";
 import { showSpinner } from "../../Stores/Reducers/spinner";
+import { showToast,validate } from '../../services/Common'
 
 import '../../css/Todo.css'
 
@@ -31,7 +31,7 @@ export default function Todos()
      *  also reset todo text input box
     */
     const addTodo=()=>{
-        if(validate())
+        if(validate(todoTitle))
         {
             dispatch(showSpinner(true))
             postServerWithDataAndAuth(ADDTODO,{
@@ -119,34 +119,6 @@ export default function Todos()
         if(data !== undefined)
         {
             dispatch(setTodos(data.data.todos))
-        }
-    }
-
-    /*
-     * validate()
-     * Validate check if only spaces are entered
-    */
-    const validate = () =>{
-        var pattern = /.*[^ ].*/
-        return pattern.test(todoTitle)
-    }
-
-    /*
-     * showToast(content:string, type:string)
-     * showing toast with string
-    */
-    const showToast = (content, type) =>{
-        switch(type)
-        {
-            case 'error' :
-                toast.error(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-            break;
-            default :
-                toast(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
         }
     }
 

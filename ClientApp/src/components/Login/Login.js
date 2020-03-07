@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom';
 import { useDispatch } from "react-redux";
-import { toast } from 'react-toastify';
 import {Form,Row,Button, Jumbotron} from 'react-bootstrap'
 import { showSpinner } from "../../Stores/Reducers/spinner";
 
 import { setInfo } from "../../Stores/Reducers/userInfo";
-
 import authenticationService from '../../services/Authentication'
+import {showToast} from '../../services/Common'
 
 import '../../css/Login.css'
 
@@ -64,25 +63,6 @@ export default function Login()
      */
     const handleRegister = () => {
         setToRegister(true)
-    }
-
-    /*
-     * showToast(content:string, type:string)
-     * showing toast with string
-    */
-    const showToast = (content, type) =>{
-        switch(type)
-        {
-            case 'error' :
-                toast.error(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-            break;
-            default :
-                toast(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-        }
     }
 
    if(toRegister === true)

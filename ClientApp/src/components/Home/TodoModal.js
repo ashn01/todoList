@@ -1,12 +1,12 @@
 import React, {useState} from 'react'
 import {Modal, Button, InputGroup, FormControl} from 'react-bootstrap'
-import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker'
 import $ from 'jquery'
 import { useDispatch } from "react-redux";
 
 import { showSpinner } from "../../Stores/Reducers/spinner";
 import {postServerWithDataAndAuth, MODIFYTODO, DELETETODO} from '../../APIROUTE'
+import { showToast, validate } from '../../services/Common'
 
 import "react-datepicker/dist/react-datepicker.css";
 import '../../css/Todo.css'
@@ -56,7 +56,7 @@ export default function TodoModal(props) {
      *  then, close modal
     */
     const modifyTodo = () =>{
-        if(validate())
+        if(validate(todoName))
         {
             dispatch(showSpinner(true))
             postServerWithDataAndAuth(MODIFYTODO, {
@@ -89,34 +89,6 @@ export default function TodoModal(props) {
         // }).then(res => {
         //     props.onHide(true) // true to update
         // })
-    }
-
-    /*
-     * validate()
-     * Validate check if only spaces are entered
-    */
-    const validate = () =>{
-        var pattern = /.*[^ ].*/
-        return pattern.test(todoName)
-    }
-
-    /*
-     * showToast(content:string, type:string)
-     * showing toast with string
-    */
-    const showToast = (content, type) =>{
-        switch(type)
-        {
-            case 'error' :
-                toast.error(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-            break;
-            default :
-                toast(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-        }
     }
 
     return (
