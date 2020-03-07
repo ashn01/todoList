@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import TodoModal from './TodoModal'
-import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from "react-redux";
 
 import {postServerWithDataAndAuth , ADDTODO, DELETETODO, MODIFYTODO } from '../../APIROUTE'
 import { setTodos} from "../../Stores/Reducers/categories";
 import { showSpinner } from "../../Stores/Reducers/spinner";
+import { showToast,validate } from '../../services/Common'
 
 import '../../css/Todo.css'
 
@@ -31,7 +31,7 @@ export default function Todos()
      *  also reset todo text input box
     */
     const addTodo=()=>{
-        if(todoTitle.length !== 0)
+        if(validate(todoTitle))
         {
             dispatch(showSpinner(true))
             postServerWithDataAndAuth(ADDTODO,{
@@ -51,7 +51,7 @@ export default function Todos()
         }
         else
         {
-            showToast("Empty todo cannot be added!")
+            showToast("Empty todo cannot be added!",'error')
         }
     }
     
@@ -120,15 +120,6 @@ export default function Todos()
         {
             dispatch(setTodos(data.data.todos))
         }
-    }
-
-    /*  showToast(content:string)
-     *  display toast with string
-    */
-    const showToast = (content) =>{
-        toast(content,{position:"top-right", 
-                            autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                            closeOnClick: true, pauseOnHover: true, draggable: true})
     }
 
     /*  showToast(date:Date)

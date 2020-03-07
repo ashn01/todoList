@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom';
 import {Form,Button, Jumbotron} from 'react-bootstrap'
-import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
 
 import { showSpinner } from "../../Stores/Reducers/spinner";
 import {postServerWithData , REGISTER} from '../../APIROUTE'
-import { useDispatch } from 'react-redux';
+import {showToast} from '../../services/Common'
 
 export default function Register() {
     const [email, setEmail] = useState('')
@@ -61,25 +61,6 @@ export default function Register() {
      */
     const handleLogin = () => {
         setToLogin(true)
-    }
-
-    /*
-     * showToast(content:string, type:string)
-     * showing toast with string
-    */
-   const showToast = (content, type) =>{
-        switch(type)
-        {
-            case 'error' :
-                toast.error(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-            break;
-            default :
-                toast(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-        }
     }
 
     if(toLogin === true)

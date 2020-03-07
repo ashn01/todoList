@@ -1,9 +1,9 @@
 import React,{useState} from 'react'
 import {Form,Row,Button, Jumbotron} from 'react-bootstrap'
 import { Redirect } from 'react-router-dom'
-import { toast } from 'react-toastify';
 
 import {postServerWithDataAndAuth , CONFIRMEMAIL} from '../../APIROUTE'
+import {showToast} from '../../services/Common'
 
 export default function Verification()
 {
@@ -34,26 +34,6 @@ export default function Verification()
             showToast("Error to confirm email", 'error')
             console.log(err)
         })
-        
-    }
-
-    /*
-     * showToast(content:string, type:string)
-     * showing toast with string
-    */
-    const showToast = (content, type) =>{
-        switch(type)
-        {
-            case 'error' :
-                toast.error(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-            break;
-            default :
-                toast(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-        }
         
     }
 

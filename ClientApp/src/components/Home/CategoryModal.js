@@ -1,10 +1,10 @@
 import React, {useState} from 'react'
 import {Modal, Button, InputGroup, FormControl, Alert} from 'react-bootstrap'
-import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from "react-redux";
 
 import { showSpinner } from "../../Stores/Reducers/spinner";
 import {postServerWithDataAndAuth , ADDCATEGORY, MODIFYCATEGORY, DELETECATEGORY} from '../../APIROUTE'
+import {showToast, validate} from '../../services/Common'
 
 export default function CategoryModal(props) {
     const [categoryName, setCategoryName] = useState(props.category !== undefined ? 
@@ -37,7 +37,7 @@ export default function CategoryModal(props) {
      * after modifying, modal closed and send categories data to parent function 
     */
     const modifyCategory = () =>{
-        if(validate())
+        if(validate(categoryName))
         {
             dispatch(showSpinner(true))
             postServerWithDataAndAuth(MODIFYCATEGORY, {
@@ -52,6 +52,10 @@ export default function CategoryModal(props) {
                 dispatch(showSpinner(false))
             })
         }
+        else
+        {
+            showToast("Category name must contain at least one character", 'error')
+        }
     }
 
     /*
@@ -60,7 +64,7 @@ export default function CategoryModal(props) {
      * after adding, modal closed and send categories data to parent function 
     */
     const addCategory = () =>{
-        if(validate())
+        if(validate(categoryName))
         {
             dispatch(showSpinner(true))
             postServerWithDataAndAuth(ADDCATEGORY,{
@@ -83,15 +87,6 @@ export default function CategoryModal(props) {
     }
 
     /*
-     * validate()
-     * Validate check if only spaces are entered
-    */
-    const validate = () =>{
-        var pattern = /.*[^ ].*/
-        return pattern.test(categoryName)
-    }
-
-    /*
      * deleteCategory()
      * send owner category, and category id
      * after deleting, modal closed and send categories data to parent function 
@@ -108,25 +103,6 @@ export default function CategoryModal(props) {
         }).catch(err=>{
             dispatch(showSpinner(false))
         })
-    }
-
-    /*
-     * showToast(content:string, type:string)
-     * showing toast with string
-    */
-    const showToast = (content, type) =>{
-        switch(type)
-        {
-            case 'error' :
-                toast.error(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-            break;
-            default :
-                toast(content,{position:"top-right", 
-                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                closeOnClick: true, pauseOnHover: true, draggable: true})
-        }
     }
 
     return (
