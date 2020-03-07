@@ -56,7 +56,7 @@ export default function TodoModal(props) {
      *  then, close modal
     */
     const modifyTodo = () =>{
-        if(todoName.length !== 0)
+        if(validate())
         {
             dispatch(showSpinner(true))
             postServerWithDataAndAuth(MODIFYTODO, {
@@ -76,7 +76,7 @@ export default function TodoModal(props) {
             })
         }else
         {
-            showToast("Todo name cannot be empty!")
+            showToast("Todo name cannot be empty!",'error')
         }
 
     }
@@ -91,13 +91,32 @@ export default function TodoModal(props) {
         // })
     }
 
-    /*  showToast(content:string)
-     *  Displaying toast with string
+    /*
+     * validate()
+     * Validate check if only spaces are entered
     */
-    const showToast = (content) =>{
-        toast(content,{position:"top-right", 
-                            autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                            closeOnClick: true, pauseOnHover: true, draggable: true})
+    const validate = () =>{
+        var pattern = /.*[^ ].*/
+        return pattern.test(todoName)
+    }
+
+    /*
+     * showToast(content:string, type:string)
+     * showing toast with string
+    */
+    const showToast = (content, type) =>{
+        switch(type)
+        {
+            case 'error' :
+                toast.error(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+            break;
+            default :
+                toast(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+        }
     }
 
     return (

@@ -31,7 +31,7 @@ export default function Todos()
      *  also reset todo text input box
     */
     const addTodo=()=>{
-        if(todoTitle.length !== 0)
+        if(validate())
         {
             dispatch(showSpinner(true))
             postServerWithDataAndAuth(ADDTODO,{
@@ -51,7 +51,7 @@ export default function Todos()
         }
         else
         {
-            showToast("Empty todo cannot be added!")
+            showToast("Empty todo cannot be added!",'error')
         }
     }
     
@@ -122,13 +122,32 @@ export default function Todos()
         }
     }
 
-    /*  showToast(content:string)
-     *  display toast with string
+    /*
+     * validate()
+     * Validate check if only spaces are entered
     */
-    const showToast = (content) =>{
-        toast(content,{position:"top-right", 
-                            autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                            closeOnClick: true, pauseOnHover: true, draggable: true})
+    const validate = () =>{
+        var pattern = /.*[^ ].*/
+        return pattern.test(todoTitle)
+    }
+
+    /*
+     * showToast(content:string, type:string)
+     * showing toast with string
+    */
+    const showToast = (content, type) =>{
+        switch(type)
+        {
+            case 'error' :
+                toast.error(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+            break;
+            default :
+                toast(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+        }
     }
 
     /*  showToast(date:Date)
