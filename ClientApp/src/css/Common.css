@@ -3,8 +3,14 @@ hr
     opacity: 0.5;
 }
 
-
-
+.toggleDiv
+{
+    display: block;
+}
+.toggleDiv.hidden
+{
+    display: none;
+}
 .registerForm>div
 {
     height: 60px;
