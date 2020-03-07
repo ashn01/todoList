@@ -37,18 +37,21 @@ export default function CategoryModal(props) {
      * after modifying, modal closed and send categories data to parent function 
     */
     const modifyCategory = () =>{
-        dispatch(showSpinner(true))
-        postServerWithDataAndAuth(MODIFYCATEGORY, {
-            owner: info.id,
-            id: categoryId,
-            categoryname:categoryName
-        }).then(res => {
-            dispatch(showSpinner(false))
-            showToast(props.category.categoryName + " category modified!")
-            props.onHide(res, "modify") // true to update
-        }).catch(err=>{
-            dispatch(showSpinner(false))
-        })
+        if(validate())
+        {
+            dispatch(showSpinner(true))
+            postServerWithDataAndAuth(MODIFYCATEGORY, {
+                owner: info.id,
+                id: categoryId,
+                categoryname:categoryName
+            }).then(res => {
+                dispatch(showSpinner(false))
+                showToast(props.category.categoryName + " category modified!")
+                props.onHide(res, "modify") // true to update
+            }).catch(err=>{
+                dispatch(showSpinner(false))
+            })
+        }
     }
 
     /*
@@ -57,9 +60,9 @@ export default function CategoryModal(props) {
      * after adding, modal closed and send categories data to parent function 
     */
     const addCategory = () =>{
-        dispatch(showSpinner(true))
-        if(categoryName !== "")
+        if(validate())
         {
+            dispatch(showSpinner(true))
             postServerWithDataAndAuth(ADDCATEGORY,{
                 owner:info.id, 
                 categoryname:categoryName
@@ -75,8 +78,17 @@ export default function CategoryModal(props) {
         }
         else
         {
-            console.log("Category name is required")
+            showToast("Category name must contain at least one character", 'error')
         }
+    }
+
+    /*
+     * validate()
+     * Validate check if only spaces are entered
+    */
+    const validate = () =>{
+        var pattern = /.*[^ ].*/
+        return pattern.test(categoryName)
     }
 
     /*
@@ -99,13 +111,22 @@ export default function CategoryModal(props) {
     }
 
     /*
-     * showToast(content:string)
+     * showToast(content:string, type:string)
      * showing toast with string
     */
-    const showToast = (content) =>{
-        toast(content,{position:"top-right", 
-                            autoClose: 3000, hideProgressBar:true, newestOnTop:true,
-                            closeOnClick: true, pauseOnHover: true, draggable: true})
+    const showToast = (content, type) =>{
+        switch(type)
+        {
+            case 'error' :
+                toast.error(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+            break;
+            default :
+                toast(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+        }
     }
 
     return (

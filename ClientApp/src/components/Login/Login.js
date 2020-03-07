@@ -40,16 +40,22 @@ export default function Login()
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        dispatch(showSpinner(true))
-        authenticationService.login(email, password)
-            .then(res => {
-                dispatch(showSpinner(false))
-                dispatch(setInfo(res.id, res.email, res.firstName, res.lastName))
-                setToHome(true)
-            }).catch(err => {
-                showToast('Failed to Login')
-                dispatch(showSpinner(true))
-            })
+        if(!(email.length === 0 || password.length === 0 ))
+        {
+            dispatch(showSpinner(true))
+            authenticationService.login(email, password)
+                .then(res => {
+                    dispatch(showSpinner(false))
+                    dispatch(setInfo(res.id, res.email, res.firstName, res.lastName))
+                    setToHome(true)
+                }).catch(err => {
+                    showToast(err.data.message,'error')
+                    dispatch(showSpinner(false))
+                })
+        }else
+        {
+            showToast("Email and password required",'error')
+        }
         setValidated(true)
     }
 
@@ -61,19 +67,22 @@ export default function Login()
     }
 
     /*
-     * showToast(content:string)
+     * showToast(content:string, type:string)
      * showing toast with string
-     */
-    const showToast = (content) => {
-        toast(content, {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            newestOnTop: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true
-        })
+    */
+    const showToast = (content, type) =>{
+        switch(type)
+        {
+            case 'error' :
+                toast.error(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+            break;
+            default :
+                toast(content,{position:"top-right", 
+                autoClose: 3000, hideProgressBar:true, newestOnTop:true,
+                closeOnClick: true, pauseOnHover: true, draggable: true})
+        }
     }
 
    if(toRegister === true)

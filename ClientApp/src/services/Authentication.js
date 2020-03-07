@@ -22,7 +22,7 @@ function login(email, password) {
                 currentUserSubject.next(res.data);
                 resolve(res.data);
         }).catch(err=>{
-            reject(err.response.status);
+            reject(err.response);
         })
     })
 }

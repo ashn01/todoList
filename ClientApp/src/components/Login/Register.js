@@ -36,10 +36,13 @@ export default function Register() {
                 dispatch(showSpinner(false))
                 handleLogin()
             }).catch(err => {
-                showToast("Error to register",'error')
                 dispatch(showSpinner(false))
-                console.log(err)
+                showToast(err.response.data.message,'error')
             })
+        }
+        else
+        {
+            showToast("All information is required",'error')
         }
         setValidated(true)
     }
@@ -137,9 +140,12 @@ export default function Register() {
                     <Form.Label>
                         First Name
                     </Form.Label>
-                    <Form.Control type="text" placeholder="FirstName" required
-                        onChange={e=>setFirstname(e.target.value)} value={firstname} 
+                    <Form.Control type="text" placeholder="FirstName"
+                        onChange={e=>{e.target.validity.valid ? 
+                                setFirstname(e.target.value) 
+                                : setFirstname(firstname)}} value={firstname} 
                         isValid={firstname.length > 0}
+                        pattern="[a-zA-Z]*"
                         isInvalid={firstname.length === 0 && validated}/>
                     <Form.Control.Feedback type="invalid">
                         Invalid First Name
@@ -149,9 +155,12 @@ export default function Register() {
                     <Form.Label>
                         Last Name
                     </Form.Label>
-                    <Form.Control type="text" placeholder="LastName" required
-                        onChange={e=>setLastname(e.target.value)} value={lastname} 
+                    <Form.Control type="text" placeholder="LastName"
+                        onChange={e=>{e.target.validity.valid ? 
+                                setLastname(e.target.value) 
+                                : setLastname(lastname)}} value={lastname} 
                         isValid={lastname.length > 0}
+                        pattern="[a-zA-Z]*"
                         isInvalid={lastname.length === 0 && validated}/>
                     <Form.Control.Feedback type="invalid">
                         Invalid Last Name

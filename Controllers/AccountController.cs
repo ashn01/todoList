@@ -127,7 +127,7 @@ namespace TodoListWeb.Controllers
             catch (Exception ex)
             {
                 // return error message if there was an exception
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { ex.Message });
             }
         }
 
