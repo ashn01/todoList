@@ -7,6 +7,7 @@ import Home from './Home/Home'
 import Login  from './Login/Login';
 import Register  from './Login/Register';
 import Verification  from './Login/Verification';
+import Setting from './Home/Setting'
 
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/Common.css'
@@ -32,6 +33,8 @@ export default function Main (props)
             return <Register/>
             case 'verification' :
             return <Verification/>
+            case 'setting' :
+            return <Setting/>
             default : 
             return null
         }
