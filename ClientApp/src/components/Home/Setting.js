@@ -58,7 +58,6 @@ export default function Setting()
                 <div className="settingTitle">
                     <div className="card-header settingHeader">
                         <div className="nav flex-column settingHeaderItems" id="nav-tab" role="tablist" aria-orientation="vertical">
-                            <a className="nav-link active" id="nav-general-tab" data-toggle="tab" href="#nav-general" role="tab" aria-controls="nav-general" aria-selected="true">General</a>
                             <a className="nav-link" id="nav-acoount-tab" data-toggle="tab" href="#nav-acoount" role="tab" aria-controls="nav-acoount" aria-selected="false">Account</a>
                             <a className="nav-link" id="nav-user-tab" data-toggle="tab" href="#nav-user" role="tab" aria-controls="nav-user" aria-selected="false">Security</a>
                         </div>
@@ -67,9 +66,6 @@ export default function Setting()
                 <div className="settingBody">
                     <div className="card-body">
                         <div className="tab-content" id="nav-tabContent">
-                            <div className="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab">
-                                
-                            </div>
                             <div className="tab-pane fade" id="nav-acoount" role="tabpanel" aria-labelledby="nav-acoount-tab">
                                 <Account/>
                             </div>
