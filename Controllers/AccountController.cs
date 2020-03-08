@@ -90,6 +90,25 @@ namespace TodoListWeb.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("validatePassword")]
+        public IActionResult ValidatePassword([FromBody] UserModel model)
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
+
+            if (_userService.Validate(token) != null)
+            {
+                var user = _userService.Authenticate(model.Email, model.Password);
+
+                if (user == null)
+                    return BadRequest(new { message = "Username or password is incorrect" });
+
+                return Ok();
+            }
+            else
+                return Unauthorized(new { message = "Invalid Token" });
+        }
+
+        [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register([FromBody]RegisterModel model)
         {
@@ -131,6 +150,69 @@ namespace TodoListWeb.Controllers
             }
         }
 
+
+        [AllowAnonymous]
+        [HttpPost("forgotPassword")]
+        public IActionResult ForgotPassword([FromBody] ForgotPasswordModel model)
+        {
+            try
+            {
+                var userId = _userService.getUserId(model.Email);
+                if(userId == null)
+                    return BadRequest(new { message = "User does'n not exists" });
+                // create token
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Name, userId.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddMinutes(10),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                var code = tokenString;
+                var callbackUrl = Url.Action("resetUserPassword", "account", new { userId = userId, code = code }, protocol: HttpContext.Request.Scheme);
+                var html = "Reset your password by clicking this link: <a href='" + callbackUrl + "'>link</a>";
+                _emailSender.SendEmailAsync(model.Email, "Reset password requested", "Reset Password", html);
+                
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e });
+            }
+        }
+
+        
+        [AllowAnonymous]
+        [HttpPost("resetPassword")]
+        public IActionResult ResetPassword([FromBody] ResetPasswordModel model)
+        {
+            try
+            {
+                var tokenClaims = _userService.Validate(model.token);
+                if (tokenClaims == null)
+                    return Unauthorized();
+
+                var userId = tokenClaims.Identity.Name;
+                if (model.id.Contains(userId))
+                {
+                    _userService.ResetPassword(model.id, model.Password);
+                    return Ok();
+                }
+                else
+                    return Unauthorized(new { message = "Invalid access" });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e });
+            }
+        }
         [AllowAnonymous]
         [HttpPost("confirmEmail")]
         public IActionResult ConfirmEmail([FromBody] ConfirmEmailModel model)
@@ -155,39 +237,57 @@ namespace TodoListWeb.Controllers
                 return BadRequest( new { e });
             }
         }
-        /*
+
         [AllowAnonymous]
-        [HttpGet("ConfirmEmail")]
-        public IActionResult ConfirmEmail([FromQuery(Name = "userId")] string id, [FromQuery(Name = "code")] string token)
+        [HttpPost("changeUserInfo")]
+        public IActionResult ChangeFirstName([FromBody] UserModel model)
         {
-            try
-            {
-                var tokenClaims = _userService.Validate(token);
-                if (tokenClaims == null)
-                    return Unauthorized();
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
 
-                var userId = tokenClaims.Identity.Name;
-                if (id.Contains(userId))
+            if (_userService.Validate(token) != null)
+            {
+                var user = _mapper.Map<User>(model);
+                try
                 {
-                    _userService.ConfirmEmail(id);
-                    return Ok();
+                    var u = _userService.UpdateUser(user, model.Password ,model.NewPassword);
+                    var ret = _mapper.Map<PublicUserModel>(u);
+
+                    return Ok(ret);
                 }
-                else
-                    return Unauthorized(new { message = "Invalid access" });
+                catch (Exception ex)
+                {
+                    // return error message if there was an exception
+                    return BadRequest(new { ex.Message });
+                }
             }
-            catch(Exception e)
-            {
-                return BadRequest( new { e });
-            }
+            else
+                return Unauthorized(new { message = "Invalid Token" });
         }
-         */
 
-
-        [HttpGet]
-        public IActionResult GetAll()
+        [AllowAnonymous]
+        [HttpPost("deleteUser")]
+        public IActionResult DeleteUser([FromBody] UserModel model)
         {
-            var users = _userService.GetAll();
-            return Ok(users);
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", string.Empty);
+
+            if (_userService.Validate(token) != null)
+            {
+                var user = _mapper.Map<User>(model);
+                try
+                {
+                    _userService.DeleteUser(user);
+
+                    return Ok(model);
+                }
+                catch (Exception ex)
+                {
+                    // return error message if there was an exception
+                    return BadRequest(new { ex.Message });
+                }
+            }
+            else
+                return Unauthorized(new { message = "Invalid Token" });
         }
+
     }
 }

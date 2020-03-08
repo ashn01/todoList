@@ -3,8 +3,13 @@ import authenticationService from './services/Authentication';
 
 export const LOGIN = `${process.env.REACT_APP_API_URL}/account/authenticate`
 export const REGISTER = `${process.env.REACT_APP_API_URL}/account/register`
+export const VERIFYPASSWORD = `${process.env.REACT_APP_API_URL}/account/validatePassword`
+export const FORGOTPASSWORD = `${process.env.REACT_APP_API_URL}/account/forgotPassword`
+export const RESETPASSWORD = `${process.env.REACT_APP_API_URL}/account/resetPassword`
 export const VERIFYTOKEN = `${process.env.REACT_APP_API_URL}/account/validate`
 export const CONFIRMEMAIL = `${process.env.REACT_APP_API_URL}/account/confirmEmail`
+export const UPDATEUSER = `${process.env.REACT_APP_API_URL}/account/changeUserInfo`
+export const DELETEUSER = `${process.env.REACT_APP_API_URL}/account/deleteUser`
 
 export const ADDCATEGORY = `${process.env.REACT_APP_API_URL}/api/category/add`
 export const GETCATEGORY = `${process.env.REACT_APP_API_URL}/api/category/getById`
@@ -15,6 +20,7 @@ export const ADDTODO = `${process.env.REACT_APP_API_URL}/api/todo/add`
 export const GETTODO = `${process.env.REACT_APP_API_URL}/api/todo/getById`
 export const MODIFYTODO = `${process.env.REACT_APP_API_URL}/api/todo/editById`
 export const DELETETODO = `${process.env.REACT_APP_API_URL}/api/todo/deleteById`
+
 
 
 function getToken()

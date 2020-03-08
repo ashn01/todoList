@@ -217,10 +217,76 @@ hr
     transform: translate(50%,50%);
 }
 
+.settingCard
+{
+    margin: 20px;
+}
+
+.settingHeader
+{
+    border: none !important;
+}
+
+.settingRow
+{
+    margin: 0 !important;
+}
+
+.settingHeaderItems
+{
+    margin-right: -21px;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    border-top-left-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+    border-right: none;
+}
+
+.settingHeaderItems>a
+{
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    border-right:1px solid rgba(0, 0, 0, 0);
+    color: #495057;
+}
+
+.settingHeaderItems>a:first-child
+{
+    border-top-left-radius: .25rem;
+}
+
+.settingHeaderItems>a:last-child
+{
+    border-bottom: none;
+    border-bottom-left-radius: .25rem;
+}
+
+.settingHeaderItems>a.active
+{
+    border-right:1px solid white;
+    background-color: white;
+}
+
+.settingBody
+{
+    text-align: left;
+}
+.settingBody>h2
+{
+    font-size: 24px;
+}
 
 @media only screen and (max-width: 599px) {
     .input-group>.input-group-prepend.todoModalPrepand {
         flex: 0 0 30%;
+    }
+    .settingTitle
+    {
+        flex: 0 0 30%;
+        border-right:1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .settingBody
+    {
+        flex:1 1;
     }
 }
 
@@ -229,6 +295,16 @@ hr
     .input-group>.input-group-prepend.todoModalPrepand {
         flex: 0 0 30%;
     }
+    .settingTitle
+    {
+        flex: 0 0 15%;
+        border-right:1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .settingBody
+    {
+        flex:1 1;
+    }
 }
   
 /* Tablet Styles */
@@ -236,11 +312,33 @@ hr
     .input-group>.input-group-prepend.todoModalPrepand {
         flex: 0 0 15%;
     }
+
+    .settingTitle
+    {
+        flex: 0 0 15%;
+        border-right:1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .settingBody
+    {
+        flex:1 1;
+    }
 }
   
 /* Desktop Styles */
 @media only screen and (min-width: 1600px) {
     .input-group>.input-group-prepend.todoModalPrepand {
         flex: 0 0 15%;
+    }
+
+    .settingTitle
+    {
+        flex: 0 0 15%;
+        border-right:1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .settingBody
+    {
+        flex:1 1;
     }
 }
