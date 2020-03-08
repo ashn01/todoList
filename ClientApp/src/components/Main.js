@@ -6,8 +6,9 @@ import {Spinner} from 'react-bootstrap'
 import Home from './Home/Home'
 import Login  from './Login/Login';
 import Register  from './Login/Register';
+import ForgotPassword  from './Login/ForgotPassword';
 import Verification  from './Login/Verification';
-import Setting from './Home/Setting'
+import ResetPassword  from './Login/ResetPassword';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/Common.css'
@@ -33,8 +34,10 @@ export default function Main (props)
             return <Register/>
             case 'verification' :
             return <Verification/>
-            case 'setting' :
-            return <Setting/>
+            case 'forgotPassword' :
+            return <ForgotPassword/>
+            case 'resetPassword' :
+            return <ResetPassword/>
             default : 
             return null
         }

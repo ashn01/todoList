@@ -20,9 +20,11 @@ namespace TodoListWeb.Services
         string getUserId(string username);
         public ClaimsPrincipal Validate(string token);
         User Create(User user, string password);
+        User UpdateUser(User user, string curPassword, string newPassword);
+        void DeleteUser(User user);
         User ConfirmEmail(string userId);
+        User ResetPassword(string userId, string password);
         bool CheckConfirmed(string username);
-        IEnumerable<User> GetAll();
     }
     public class UserService : IUserService
     {
@@ -107,11 +109,6 @@ namespace TodoListWeb.Services
             //}
         }
 
-        public IEnumerable<User> GetAll()
-        {
-            return null;
-        }
-
         public User Create(User user, string password)
         {
             // validation
@@ -153,6 +150,51 @@ namespace TodoListWeb.Services
             return user;
         }
 
+        public User UpdateUser(User user, string curPassword, string newPassword)
+        {
+            if (user == null)
+                throw new Exception("Wrong User ID");
+
+            var u = _context.Users.SingleOrDefault(x => x.Email == user.Email);
+
+            u.FirstName = user.FirstName == null ? u.FirstName : user.FirstName;
+            u.LastName = user.LastName == null ? u.LastName : user.LastName;
+
+            // check password
+            if (newPassword != null)
+            {
+                var ret = Authenticate(user.Email, curPassword);
+                if (ret == null)
+                    throw new Exception("Wrong password");
+
+                // correct password and hashing new password
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(newPassword, out passwordHash, out passwordSalt);
+
+                u.PasswordHash = passwordHash;
+                u.PasswordSalt = passwordSalt;
+            }
+
+            _context.Users.Update(u);
+            _context.SaveChanges();
+
+            return u;
+        }
+
+        public void DeleteUser(User user)
+        {
+            if (user == null)
+                throw new Exception("Wrong User ID");
+
+            var u = _context.Users.SingleOrDefault(x => x.Email == user.Email);
+
+            // remove all categories
+            _context.NewCategories.RemoveRange(_context.NewCategories.Where(x => x.Owner == u.Id));
+
+            _context.Users.Remove(u);
+            _context.SaveChanges();
+        }
+
         public User ConfirmEmail(string userId)
         {
             // validation
@@ -164,6 +206,29 @@ namespace TodoListWeb.Services
 
             var user = _context.Users.SingleOrDefault(x => x.Id == userId);
             user.EmailConfirmed = true;
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
+
+            return user;
+        }
+
+        public User ResetPassword(string userId, string password)
+        {
+            // validation
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new Exception("Wrong User ID");
+
+            if (!_context.Users.Any(x => x.Id == userId))
+                throw new Exception("User Not Found");
+
+            var user = _context.Users.SingleOrDefault(x => x.Id == userId);
+
+            byte[] passwordHash, passwordSalt;
+            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
 
             _context.Users.Update(user);
             _context.SaveChanges();

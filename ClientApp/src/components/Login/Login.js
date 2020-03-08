@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import {Form,Row,Button, Jumbotron} from 'react-bootstrap'
 import { showSpinner } from "../../Stores/Reducers/spinner";
@@ -113,6 +113,9 @@ export default function Login()
                 <Form.Group as={Row} controlId="register">
                     <Button variant="outline-secondary" type="button" onClick={()=>handleRegister()} className="float-right" block>Register</Button>
                 </Form.Group>
+                <Link to="/forgotPassword" className="float-right">
+                    Forgot password?
+                </Link>
             </Form>
         </div>
     )

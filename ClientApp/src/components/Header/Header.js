@@ -65,7 +65,7 @@ export default function Header()
             <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
                 <ul className="navbar-nav ml-auto">
                     <li className="nav-item">
-                        <Link to="/setting" className="nav-item nav-link">Setting</Link>
+                        <Link to="/home" onClick={()=>handleSwitch(2)} className={`nav-item nav-link ${panelIndex===2 ? "active" :""}`}>Setting</Link>
                     </li>
                     <li className="nav-item">
                         <Link to="/login" onClick={()=>logout()} className="nav-item nav-link">Logout</Link>
